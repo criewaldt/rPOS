@@ -3,7 +3,7 @@ This project requires:
 Flask: Server for the POS
 flask-socketio: for open sockets
 flask-login: for user auth with server
-xldd: to read excel files (inventory, menu, etc)
+xlrd: to read excel files (inventory, menu, etc)
 xlwt: to write excel file (analytics output, etc)
 
 + any other future packages needed
