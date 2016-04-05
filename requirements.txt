@@ -1,0 +1,5 @@
+Flask==0.10.1
+flask-socketio==2.2
+flask-login==0.3.2
+xlrd==0.9.4
+xlwt==1.0.0
