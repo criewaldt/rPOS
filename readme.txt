@@ -14,5 +14,5 @@ How to install requirements:
 2) activate your virtualenv
 3) run: ‘pip install -r requirements.txt’ in shell
 
-Run rPOS_test.py to see how rPOS client works with database to store session and global data for POS.
+Run test.py to see how rPOS client works with database to store session and global data for POS.
 
