@@ -11,7 +11,7 @@ socketio = SocketIO(app)
 @app.route('/')
 def index():
     print "new user"
-    return render_template('waiter.html')
+    return render_template('index.html')
 
 
 @socketio.on('connect', namespace='/')
@@ -23,15 +23,12 @@ def test_connect():
 def handle_message(message):
     if message == 'buttonBuilder':
         send({'buttonBuilder': \
-                 {'sandwiches':\
-                      [{'burger':'10.50',\
-                       'club':9.50}],\
-                  'pasta':\
-                       [{'parmagan':9.25,\
-                        'alfrado':8.75}]}})
-        print "button setup sent"
-    if message['TEST']:
-        print message['TEST']
+                 {'burgers':\
+                      [{'BBQ':'10.50',\
+                       'CHZ':9.50}],\
+                  'chicken':\
+                       [{'club':9.25,\
+                        'melt':8.75}]}})
     else: print message
    
 
