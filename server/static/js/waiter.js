@@ -14,6 +14,11 @@ function CountMyItems(obj) {
 /*Used to build buttons on the screen based on what the server sends
 in response to ButtonBuilder request*/
 function ButtonBuilder() {
+	/*
+	POPULATE DROP DOWN WITH JSON
+	http://stackoverflow.com/questions/21747878/how-to-populate-a-dropdown-list-with-json-data-dynamically-section-wise-into-th
+	
+	*/
 	mySocket.send('buttonBuilder');
 
 	var totalButtons = CountMyItems(AllMyItems);
@@ -41,9 +46,21 @@ $(document).ready(function(){
 	mySocket.on('message', function(msg) {
 		  //console.log(msg['buttonBuilder']);	
 		  if (msg['buttonBuilder']) {
-		  	console.log('true');
+		  	console.log(msg);
+		  	console.log(CountMyItems(msg));
+		  	console.log(CountMyItems(msg.buttonBuilder));
+		  	var MyTest = msg.buttonBuilder.burgers;
+		  	console.log(MyTest[0].BBQ);
+		  	for (index in MyTest) {
+		  		$('#testArea').append('<li><a href="#" item="'+MyTest[index].BBQ+'" price="'+MyTest[index].CHZ+'">TEST</a></li>');
+		  		//$('#testArea').append("<p>" + MyTest[index].BBQ+"</p>");
+		  	}
 		  }else console.log('false');
 	});
+	
+	 $('a').on('click', function(){
+    $('#show').html(   'Item : ' + $(this).attr('item') + '| Price : ' +  $(this).attr('price')   );
+  });
 	
 	
 });
