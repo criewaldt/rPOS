@@ -2,17 +2,7 @@ window.mySocket;//setup global var for the websocket
 window.TheOrder;//setup global var for the order
 window.AllItems;//setup global var for all items that can be ordered
 
-/*used to count items in a list*/
-function CountMyItems(obj) {
-    var size = 0, key;
-    for (key in obj) {
-        if (obj.hasOwnProperty(key)) size++;
-    };
-    return size;
-};
 
-/*Used to build buttons on the screen based on what the server sends
-in response to ButtonBuilder request*/
 function ButtonBuilder() {
 	mySocket.send('buttonBuilder');
 
