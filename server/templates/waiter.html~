@@ -19,7 +19,7 @@
     <li><a href="#"></a>TestItem</li>
     <div id="testArea"></div>
     <div id="show"></div>
-	 <div class ='button' style="width:45px height:45px" href="" >CLICK THIS TEXT</div>
+	 <div class ='button' style="width:45px height:45px" href="" >CLICK TEXT SEND TEST JSON</div>
 	
 </body>
 </html>
