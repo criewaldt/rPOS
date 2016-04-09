@@ -14,15 +14,19 @@ function CountMyItems(obj) {
 };
 
 /*This Function is used to build buttons on the screen*/
-function ButtonBuilder() {
+function ButtonBuilder(JSONdata) {
 	/*
 	POPULATE BUTTONS FROM JSON RECEIVED FROM SERVER
 	-resources-
 	http://stackoverflow.com/questions/21747878/how-to-populate-a-dropdown-list-with-json-data-dynamically-section-wise-into-th
    http://www.encodedna.com/2013/07/dynamically-add-remove-textbox-control-using-jquery.htm	
 	*/
-	mySocket.send(JSON.stringify({'buttonBuilder':1}));
-	var AllMyItems = mySocket.on('message', function(msg) {JSON.parse(msg);});
+	
+	console.log('button builder started');
+	/*Parent key should ALWAYS be buttonBuilder on inbound, but still check*/
+	if (Object.keys(JSONdata)!='buttonBuilder' ){console.log('button builder key error')};
+	var parentKEY = Object.keys(JSONdata);
+	var AllMyItems = JSONdata[parentKEY];
 	console.log(AllMyItems);
 	
 	
@@ -30,7 +34,7 @@ function ButtonBuilder() {
 	console.log("total buttons: " + totalButtons);
 	
 	var myItem = Object.keys(AllMyItems);
-	console.log("total keys: " + myItem);
+	console.log("keys: " + myItem);
 	
 	for (i=0; i<totalButtons;i++) {
 		var newButton = document.createElement("div");
@@ -38,8 +42,10 @@ function ButtonBuilder() {
 		newButton.setAttribute('id',myItem[i]);
 		document.getElementById('terminal').appendChild(newButton);
 		$('#'+myItem[i]).append("<p>" + myItem[i]+"</p>");
-		$('#'+myItem[i]).append("<p>$ " + AllMyItems[myItem[i]]+"</p>");
-		
+		console.log(myItem[i]);
+		if (myItem[i].price) {
+			$('#'+myItem[i]).append("<p>$ " + myItem[i].price+"</p>");
+		};
 	};
 };
 
@@ -48,8 +54,8 @@ $(document).ready(function(){
 	mySocket = io.connect();//create new websocket, 
 	
 	/* ON LOAD build the buttons on the page*/
-	//ButtonBuilder();
-mySocket.send(JSON.stringify({'buttonBuilder':1}));
+	
+	mySocket.send(JSON.stringify({'buttonBuilder':1}));
 	
 	
 	/* EXAMPLE function to send data on click*/
@@ -59,9 +65,17 @@ mySocket.send(JSON.stringify({'buttonBuilder':1}));
 	
 	/* FUNCTION TO READ INBOUND DATA*/
 	mySocket.on('message', function(msg) {
-			var readJSON = JSON.parse(msg);
-			console.log(readJSON);
-			console.log(Object.keys(readJSON));});
+			var JSONdata = JSON.parse(msg);
+			console.log(JSONdata);
+			/* ALL JSON data coming from server will have one parent key in the tree.  
+			This is used to route the JSON to appropriate place through series of IF's*/
+			
+			if (Object.keys(JSONdata)[0] === 'buttonBuilder'){
+				ButtonBuilder(JSONdata);
+			};
+			
+			
+			});
 /*
 		  if (msg['buttonBuilder']) {
 		  	var MyTest = msg.buttonBuilder;

@@ -11,16 +11,18 @@ socketio = SocketIO(app)
 
 #when live this JSON should be built by reading an excel sheet
 buttons = {'buttonBuilder': 
-                 {'entre':
-                      {'burger':
+                {'entre':
+                    {'burgers':
+                      {'bbq_burger':
                            {'price':'10.50'},
                        'veggie burger':
                            {'price':'9.50'},
                        'mods':
                            {'cheese':'1.50',
                             'bacon':'0.75',
-                            'pickles':'0.50',
-                            },
+                            'pickles':'0.50'
+                            }
+                       },
                        
                   'pasta':
                        {'parmagan':
@@ -30,13 +32,39 @@ buttons = {'buttonBuilder':
                         'mods':
                            {'sauce':'2.00',
                             'broccoli':'1.75',
-                            'garlic':'0.50',
+                            'garlic':'0.50'
                             }
                         }
-                       }
-                  }
-           }
+                       },
                   
+           'drinks':
+                    {'soda':
+                      {'coke':
+                           {'price':'1.50'},
+                       'rootbeer':
+                           {'price':'1.50'},
+                       'mods':
+                           {'lemon':'0.50',
+                            'straw':'0.05',
+                            'ice':'0.50'
+                            }
+                       },
+                       
+                  'alcohol':
+                       {'beer':
+                            {'price':'5.50'},
+                        'wine':
+                            {'price':'6.50'},
+                        'mods':
+                           {'glass':'2.00',
+                            'lemon':'1.75',
+                            'shot':'0.50'
+                            }
+                        }
+                       
+                  }
+            }           
+        }          
            
 
 @app.route('/')
