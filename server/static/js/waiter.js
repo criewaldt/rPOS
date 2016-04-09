@@ -1,8 +1,9 @@
 window.mySocket;//setup global var for the websocket
 window.TheOrder;//setup global var for the order
-window.AllItems;//setup global var for all items that can be ordered
+var AllMyItems;//setup global var for all items that can be ordered
 
-
+var orderData = {'orderData' : {'burger':{'mods':['cheese', 'bacon']}}};
+ 
                   
 /*used to count items in a list*/
 function CountMyItems(obj) {
@@ -23,12 +24,12 @@ function ButtonBuilder(JSONdata) {
 	*/
 	
 	console.log('button builder started');
-	/*Parent key should ALWAYS be buttonBuilder on inbound, but still check*/
+	
+	/*Parent key should ALWAYS be 'buttonBuilder' on inbound, but still check*/
 	if (Object.keys(JSONdata)!='buttonBuilder' ){console.log('button builder key error')};
 	var parentKEY = Object.keys(JSONdata);
-	var AllMyItems = JSONdata[parentKEY];
+	AllMyItems = JSONdata[parentKEY];//global var assignment
 	console.log(AllMyItems);
-	
 	
 	var totalButtons = CountMyItems(AllMyItems);
 	console.log("total buttons: " + totalButtons);
@@ -41,13 +42,15 @@ function ButtonBuilder(JSONdata) {
 		newButton.setAttribute('class','button');
 		newButton.setAttribute('id',myItem[i]);
 		document.getElementById('terminal').appendChild(newButton);
-		$('#'+myItem[i]).append("<p>" + myItem[i]+"</p>");
-		console.log(myItem[i].burgers.bbq_burgers);
-		if (myItem[i].price) {
-			$('#'+myItem[i]).append("<p>$ " + myItem[i].price+"</p>");
-		};
+		$('#'+myItem[i]).html(myItem[i].toUpperCase());
+		//$('#'+myItem[i]).append("<p>" + myItem[i].toUpperCase()+"</p>");
+		console.log(Object.keys(AllMyItems[myItem[i]]));
 	};
+	
+	
 };
+
+
 
 
 $(document).ready(function(){
@@ -57,8 +60,9 @@ $(document).ready(function(){
 	
 	mySocket.send(JSON.stringify({'buttonBuilder':1}));
 	
-	
+
 	/* EXAMPLE function to send data on click*/
+	
 	$(".button").click(function(event){
 		mySocket.send(JSON.stringify(orderData));
 	});
@@ -73,9 +77,22 @@ $(document).ready(function(){
 			if (Object.keys(JSONdata)[0] === 'buttonBuilder'){
 				ButtonBuilder(JSONdata);
 			};
+	/*
+	DYNAMICALLY CREATE CLICK EVENTS LISTENERS
+	https://toddmotto.com/attaching-event-handlers-to-dynamically-created-javascript-elements/
+	
+	*/
+	for (key in AllMyItems) {
+		console.log(AllMyItems[key]);
+
+	};
 			
-			
-			});
+	});
+	
+
+
+	
+	
 /*
 		  if (msg['buttonBuilder']) {
 		  	var MyTest = msg.buttonBuilder;
