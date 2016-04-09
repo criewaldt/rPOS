@@ -3,10 +3,69 @@ from flask import Flask, render_template, session, request
 from flask_socketio import SocketIO
 from flask.ext.socketio import emit, send
 import time
+import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
+
+#when live this JSON should be built by reading an excel sheet
+buttons = {'buttonBuilder': 
+                {'entre':
+                    {'burgers':
+                      {'bbq_burger':
+                           {'price':'10.50'},
+                       'veggie burger':
+                           {'price':'9.50'},
+                       'mods':
+                           {'cheese':'1.50',
+                            'bacon':'0.75',
+                            'pickles':'0.50'
+                            }
+                       },
+                       
+                  'pasta':
+                       {'parmagan':
+                            {'price':'10.50'},
+                        'alfrado':
+                            {'price':'9.50'},
+                        'mods':
+                           {'sauce':'2.00',
+                            'broccoli':'1.75',
+                            'garlic':'0.50'
+                            }
+                        }
+                       },
+                  
+           'drinks':
+                    {'soda':
+                      {'coke':
+                           {'price':'1.50'},
+                       'rootbeer':
+                           {'price':'1.50'},
+                       'mods':
+                           {'lemon':'0.50',
+                            'straw':'0.05',
+                            'ice':'0.50'
+                            }
+                       },
+                       
+                  'alcohol':
+                       {'beer':
+                            {'price':'5.50'},
+                        'wine':
+                            {'price':'6.50'},
+                        'mods':
+                           {'glass':'2.00',
+                            'lemon':'1.75',
+                            'shot':'0.50'
+                            }
+                        }
+                       
+                  }
+            }           
+        }          
+           
 
 @app.route('/')
 def index():
@@ -21,18 +80,20 @@ def test_connect():
 
 @socketio.on('message')
 def handle_message(message):
-    if message == 'buttonBuilder':
-        send({'buttonBuilder': \
-                 {'sandwiches':\
-                      [{'burger':'10.50',\
-                       'club':9.50}],\
-                  'pasta':\
-                       [{'parmagan':9.25,\
-                        'alfrado':8.75}]}})
+    dataIN = json.loads(message)
+    print dataIN
+    print dataIN.itervalues().next()
+    print dataIN.iterkeys().next()
+    if dataIN.iterkeys().next() == "buttonBuilder":
+        send(json.dumps(buttons))
         print "button setup sent"
-    if message['TEST']:
-        print message['TEST']
-    else: print message
+
+    else:
+        print message
+        print type(message)
+        print dataIN
+        print type(dataIN)
+    
    
 
 if __name__ == '__main__':
