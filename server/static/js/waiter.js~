@@ -1,3 +1,13 @@
+	/*
+	DYNAMICALLY CREATE CLICK EVENTS LISTENERS
+	https://toddmotto.com/attaching-event-handlers-to-dynamically-created-javascript-elements/
+
+	POPULATE BUTTONS FROM JSON RECEIVED FROM SERVER
+	-resources-
+	http://stackoverflow.com/questions/21747878/how-to-populate-a-dropdown-list-with-json-data-dynamically-section-wise-into-th
+   http://www.encodedna.com/2013/07/dynamically-add-remove-textbox-control-using-jquery.htm	
+	*/
+
 window.mySocket;//setup global var for the websocket
 window.TheOrder;//setup global var for the order
 var AllMyItems;//setup global var for all items that can be ordered
@@ -16,13 +26,7 @@ function CountMyItems(obj) {
 
 /*This Function is used to build buttons on the screen*/
 function ButtonBuilder(JSONdata) {
-	/*
-	POPULATE BUTTONS FROM JSON RECEIVED FROM SERVER
-	-resources-
-	http://stackoverflow.com/questions/21747878/how-to-populate-a-dropdown-list-with-json-data-dynamically-section-wise-into-th
-   http://www.encodedna.com/2013/07/dynamically-add-remove-textbox-control-using-jquery.htm	
-	*/
-	
+
 	console.log('button builder started');
 	
 	/*Parent key should ALWAYS be 'buttonBuilder' on inbound, but still check*/
@@ -41,6 +45,7 @@ function ButtonBuilder(JSONdata) {
 		var newButton = document.createElement("div");
 		newButton.setAttribute('class','button');
 		newButton.setAttribute('id',myItem[i]);
+		newButton.onclick = clickDynamic;
 		document.getElementById('terminal').appendChild(newButton);
 		$('#'+myItem[i]).html(myItem[i].toUpperCase());
 		//$('#'+myItem[i]).append("<p>" + myItem[i].toUpperCase()+"</p>");
@@ -50,7 +55,13 @@ function ButtonBuilder(JSONdata) {
 	
 };
 
-
+function clickDynamic() {
+	console.log($(this));
+	console.log($(this).context.id);
+	console.log(AllMyItems[$(this).context.id]);
+	var subButtons = AllMyItems[$(this).context.id];
+	ButtonBuilder('buttonBuilder':{subButtons});
+};
 
 
 $(document).ready(function(){
@@ -62,10 +73,10 @@ $(document).ready(function(){
 	
 
 	/* EXAMPLE function to send data on click*/
-	/*
+	
 	$(".button").click(function(event){
 		mySocket.send(JSON.stringify(orderData));
-	});*/
+	});
 	
 	/* FUNCTION TO READ INBOUND DATA*/
 	mySocket.on('message', function(msg) {
@@ -77,11 +88,7 @@ $(document).ready(function(){
 			if (Object.keys(JSONdata)[0] === 'buttonBuilder'){
 				ButtonBuilder(JSONdata);
 			};
-	/*
-	DYNAMICALLY CREATE CLICK EVENTS LISTENERS
-	https://toddmotto.com/attaching-event-handlers-to-dynamically-created-javascript-elements/
-	
-	*/
+
 	for (key in AllMyItems) {
 		console.log(AllMyItems[key]);
 
