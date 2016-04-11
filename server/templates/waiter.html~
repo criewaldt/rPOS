@@ -6,18 +6,24 @@
 	<!-- external JS code needed for client
 	<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">	
 	-->	
-	<!-- local version of above external code -->
+	<!-- local versions of above external code -->
+	<!-- CSS -->
 	<link rel="stylesheet" type="text/css" href="static/css/waiter.css">
-			<script type="text/javascript" src="static/js/jquery.js"></script>
-		<script type="text/javascript" src="static/js/socket.io.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="static/css/bootstrap.min.css">
+	<!-- JavaScript -->
+	<script type="text/javascript" src="static/js/jquery.js"></script>
+	<script type="text/javascript" src="static/js/socket.io.min.js"></script>
 	<script type="text/javascript" src="static/js/waiter.js"></script>
 	</head>
 	
 	<body>
 	 <h1>Waiter Page</h1>
-	<div id="terminal"></div>
-	 <div class ='button' style="width:45px height:45px" href="" >CLICK TEXT SEND TEST JSON</div>
-	
+	 <div class="container-fluid">
+	 <div class="col-md-4" id="orderArea">ORDER AREA</div>
+	<div class="col-md-6" id="terminal"></div>
+	 <div class ='col-md-2 button'>CLICK SEND TEST JSON</div>
+	</div>
 </body>
 </html>

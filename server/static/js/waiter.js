@@ -25,31 +25,56 @@ function CountMyItems(obj) {
 };
 
 /*This Function is used to build buttons on the screen*/
-function ButtonBuilder(JSONdata) {
-
+function ButtonBuilder(JSONdata,targetButton) {
+	targetButton = targetButton || 0;//targetButton is set to 0 as default if no targetButton arg passed
+	console.log(targetButton);	
 	console.log('button builder started');
 	
-	/*Parent key should ALWAYS be 'buttonBuilder' on inbound, but still check*/
-	if (Object.keys(JSONdata)!='buttonBuilder' ){console.log('button builder key error')};
+	//determine parent KEY for this JSON
 	var parentKEY = Object.keys(JSONdata);
-	AllMyItems = JSONdata[parentKEY];//global var assignment
-	console.log(AllMyItems);
+	console.log(parentKEY[0]);
+
+	/*Parent key should ALWAYS be 'buttonBuilder' on inbound setup JSON from server*/
+	if (parentKEY[0] ==="buttonBuilder" ){
+		AllMyItems = JSONdata[parentKEY];//global var assignment
+		var ButtonBuilderItems = AllMyItems;//local assignment
+		console.log(ButtonBuilderItems);	
+	}if(parentKEY[0]==='subButtonBuilder' ){
+		console.log(parentKEY);	
+		var ButtonBuilderItems = JSONdata[parentKEY];
+		console.log(ButtonBuilderItems);	
+		}else {console.log("add more keys");}	
 	
-	var totalButtons = CountMyItems(AllMyItems);
+	
+	var totalButtons = CountMyItems(ButtonBuilderItems);
 	console.log("total buttons: " + totalButtons);
 	
-	var myItem = Object.keys(AllMyItems);
+	var myItem = Object.keys(ButtonBuilderItems);
 	console.log("keys: " + myItem);
+
 	
 	for (i=0; i<totalButtons;i++) {
 		var newButton = document.createElement("div");
-		newButton.setAttribute('class','button');
+		if (parentKEY[0]==='buttonBuilder' ) {
+			newButton.setAttribute('class','button');
+		}if(parentKEY[0]==='subButtonBuilder' ){
+			newButton.setAttribute('class','subbutton');		
+		}else {console.log("error setting class");}	
+		
 		newButton.setAttribute('id',myItem[i]);
 		newButton.onclick = clickDynamic;
-		document.getElementById('terminal').appendChild(newButton);
-		$('#'+myItem[i]).html(myItem[i].toUpperCase());
+		if (parentKEY[0]==='buttonBuilder' ) {
+			document.getElementById('terminal').appendChild(newButton);
+			$('#'+myItem[i]).html(myItem[i].toUpperCase());
+		}if (parentKEY[0]==='subButtonBuilder' ){
+			console.log("id:" + targetButton.context.id);
+			document.getElementById(targetButton.context.id).appendChild(newButton);
+			$('#'+myItem[i]).html(myItem[i].toUpperCase());
+		};
+			
+			
 		//$('#'+myItem[i]).append("<p>" + myItem[i].toUpperCase()+"</p>");
-		console.log(Object.keys(AllMyItems[myItem[i]]));
+		//console.log(Object.keys(AllMyItems[myItem[i]]));
 	};
 	
 	
@@ -60,7 +85,8 @@ function clickDynamic() {
 	console.log($(this).context.id);
 	console.log(AllMyItems[$(this).context.id]);
 	var subButtons = AllMyItems[$(this).context.id];
-	ButtonBuilder({'buttonBuilder':subButtons});
+	var targetButton = $(this);
+	ButtonBuilder({'subButtonBuilder':subButtons},targetButton);
 };
 
 
