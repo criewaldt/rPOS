@@ -55,7 +55,6 @@ def index():
     results = query_db('select * from users where username == ? AND user_id == ?', ['chrisr4918', 'chrisr'], one=False)
     for result in results:
         print result['email']
-        print 'done'
 
     return render_template("index.html")
 
