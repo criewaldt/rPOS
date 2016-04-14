@@ -17,13 +17,13 @@ class rPOS:
         self.closeDb()
 
     def createDb(self,):
-        conn = sqlite3.connect('db/test_db.sqlite')
+        conn = sqlite3.connect('db/db.sqlite')
         c = conn.cursor()
         try:
-            c.execute("""CREATE TABLE "main"."TransactionLog"
+            c.execute("""CREATE TABLE "main"."MasterTransactionLog"
 ("table_id" TEXT NOT NULL , "datetime_created" DATETIME PRIMARY KEY  NOT NULL  UNIQUE ,
 "datetime_closed" DATETIME, "order_data" VARCHAR, "bill_total" FLOAT NOT NULL  DEFAULT 0.00,
-"balance" FLOAT NOT NULL  DEFAULT 0.00, "user_id" TEXT NOT NULL, "order_id" TEXT NOT NULL, "closed" BOOL DEFAULT False)""")
+"balance" FLOAT NOT NULL  DEFAULT 0.00, "user_id" TEXT NOT NULL, "order_id" TEXT NOT NULL)""")
 
             print('[db] No sqlite DB found. Creating them now.')
             print('[db] TransactionLog table created. This is where all records for rPOS will be stored.')
@@ -47,7 +47,26 @@ class rPOS:
         self.conn.commit()
         print("[db] Database saved.")
 
-    def inputOrder(self, order_item):
+    def start_user_session(self, user_id):
+        try:
+            c.execute("""CREATE TABLE "main"."CurrentUser_OpenTables_{}""".format(user_id))
+            c.execute("""CREATE TABLE "main"."CurrentUser_TransactionLog_{}""".format(user_id))
+
+            print('[db] Starting user session for {}'.format(user_id))
+            self.conn.commit()
+        #unless database already exists
+        except sqlite3.OperationalError:
+            print("[db] [SESSION] User session found for {}. I'll use that one.".format(user_id))
+            pass
+        
+
+    def checkout_user_session(self, ):
+        #check for open session
+        #check for open tables, if so return error
+        #return checkout info
+        pass
+
+    def input_order(self, user_id, order_item):
 
         table_id = order_item['table_id']
         order_data = order_item['order_data']
@@ -63,10 +82,11 @@ class rPOS:
         order = (
             table_id, datetime_created, datetime_closed,
             json.dumps(order_data), bill_total, balance, user_id, order_id, closed)
+
         
-        self.c.execute("""INSERT INTO TransactionLog VALUES
+        self.c.execute("""INSERT INTO CurrentUser_OpenTables_{} VALUES
                         (?,?,?,?,?,?,?,?,?)""", order)
-        print("[rPOS] Table #:{} - Order saved by: {}.".format(table_id, user_id))
+        print("[rPOS] Table #:{} - Order saved by: {}.".format(user_id, table_id, user_id))
         self.saveDb()
 
     def apply_payment(self, user_id, table_id, order_id, payment_amt=0):
@@ -95,35 +115,40 @@ class rPOS:
        
 if __name__ == "__main__":
 
+    #sqlite3 tables (user_id):
+    # CurrentUser_OpenTables_{}
+    # CurrentUser_TransactionLog_{}
+    # MasterTransactionLog
     
     #order array from client
-    order_data = [
+    order_data = {'order':[
             {'name':'burger',
                 'price':12.50,},
             {'name':'soda',
                 'price':2.50,},
-                    ]
+                    ]}
 
     #calc bill total from order array
-    bill_total = sum(item['price'] for item in order_data)
+    bill_total = sum(item['price'] for item in order_data['order'])
 
     #test order encoding
-    ORDER = {
+    TEST_ORDER = {
         'table_id':'21',
-        'order_data':order_data,
+        'order_data':order_data['order'],
         'bill_total':bill_total,
         'balance':bill_total,
         'user_id':'chrisr',
         'order_id':'1234',
         }
 
-    
+
+    """
     #start the client
     with rPOS() as pos:
 
         #input some orders
-        pos.inputOrder(ORDER)
+        pos.input_order('chrisr', TEST_ORDER)
 
         pos.apply_payment('chrisr', '21', '1234', 15.00)
-        
+    """
 
