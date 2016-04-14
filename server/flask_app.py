@@ -10,13 +10,13 @@ app.secret_key = 'itsasecret'
 
 ### DB ###
 
-DATABASE = 'db.db'
+DATABASE = '../db/db.sqlite'
 
 # This function connects the db
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
-        db = g._database = sqlite3.connect('../db/db.sqlite')
+        db = g._database = sqlite3.connect(DATABASE)
         db.row_factory = make_dicts
     return db
 
