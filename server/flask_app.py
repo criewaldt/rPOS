@@ -3,6 +3,7 @@
 from flask import Flask, session
 from flask import render_template, flash, redirect, request, url_for, abort, send_from_directory
 import sqlite3
+from sqlite3 import OperationalError
 from flask import g
 
 app = Flask(__name__)
@@ -12,12 +13,17 @@ app.secret_key = 'itsasecret'
 
 DATABASE = '../db/db.sqlite'
 
+
 # This function connects the db
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
+        #connect sqlite
         db = g._database = sqlite3.connect(DATABASE)
+        #turn row results into a dict
         db.row_factory = make_dicts
+        #init the db and make tables if they dont already exist
+        init_db()
     return db
 
 # This function connects db, executes sql string, then returns results
@@ -41,6 +47,18 @@ def close_connection(exception):
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
+
+# This function creates the db with tables if they doesnt already exist.
+def init_db():
+    db = get_db()
+    try:
+        #on first run, create tables
+        db.execute('CREATE TABLE "users" ("username" TEXT, "email" TEXT, "user_id" TEXT)')
+        db.commit()
+        pass
+    except OperationalError as e:
+        #on successive run, handle the exception and continue on using the existing tables
+        pass
         
 ### END: DB ###
 
@@ -51,16 +69,25 @@ def close_connection(exception):
 
 @app.route('/')
 def index():
+    
+    
     #sql query with one result
-    result = query_db('select * from users', one=True)
-    print result['user_id']
+    result = query_db('''SELECT name, sql FROM sqlite_master
+WHERE type='table'
+ORDER BY name;''', one=True)
+    print result
+    
+    conn = get_db()
+    conn.commit()
+    
+    """
 
     #sql query with args and many results
     # remember to use '?' and [args list] for sql injection protection
     results = query_db('select * from users where username == ? AND user_id == ?', ['chrisr4918', 'chrisr'], one=False)
     for result in results:
         print result['email']
-
+    """
     return render_template("index.html")
 
 if __name__ == "__main__":
