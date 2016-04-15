@@ -70,24 +70,16 @@ def init_db():
 @app.route('/')
 def index():
     
-    
     #sql query with one result
-    result = query_db('''SELECT name, sql FROM sqlite_master
-WHERE type='table'
-ORDER BY name;''', one=True)
+    result = query_db('select * from users', one=True)
     print result
     
-    conn = get_db()
-    conn.commit()
-    
-    """
-
     #sql query with args and many results
     # remember to use '?' and [args list] for sql injection protection
     results = query_db('select * from users where username == ? AND user_id == ?', ['chrisr4918', 'chrisr'], one=False)
     for result in results:
         print result['email']
-    """
+    
     return render_template("index.html")
 
 if __name__ == "__main__":
