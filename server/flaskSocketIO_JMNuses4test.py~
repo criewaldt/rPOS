@@ -13,7 +13,7 @@ socketio = SocketIO(app)
 buttons = {'buttonBuilder': 
                 {'entre':
                     {'burgers':
-                      {'bbq burger':
+                      {'bbq_burger':
                            {'price':'10.50'},
                        'veggie burger':
                            {'price':'9.50'},
