@@ -4,6 +4,7 @@
 	text-align: justify;}
 
 .button{
+	width:50%;
 	height:70px;//maybe remove this and allow auto size?
 	white-space: nowrap;	
 	float:left;
@@ -29,4 +30,8 @@
 		
 .button:hover{
 	background-color:blue;
+	text-align: center;}
+	
+.subbutton:hover{
+	background-color:red;
 	text-align: center;}

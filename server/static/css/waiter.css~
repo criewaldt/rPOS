@@ -4,7 +4,9 @@
 	text-align: justify;}
 
 .button{
+	width:50%;
 	height:70px;//maybe remove this and allow auto size?
+	white-space: nowrap;	
 	float:left;
 	border-style: solid;
 	border-color: #ffffff;
@@ -15,7 +17,7 @@
 	line-height: 50px;}
 	
 	
-.subbutton{width:100%;
+.subbutton{width:50%;
 	height:70px;
 	float:none;
 	border-style: solid;
@@ -28,4 +30,8 @@
 		
 .button:hover{
 	background-color:blue;
+	text-align: center;}
+	
+.subbutton:hover{
+	background-color:red;
 	text-align: center;}

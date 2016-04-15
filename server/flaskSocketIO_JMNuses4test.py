@@ -18,9 +18,9 @@ buttons = {'buttonBuilder':
                        'veggie burger':
                            {'price':'9.50'},
                        'mods':
-                           {'cheese':'1.50',
-                            'bacon':'0.75',
-                            'pickles':'0.50'
+                           {'cheese':{'price':'10.50'},
+                            'bacon':{'price':'10.50'},
+                            'pickles':{'price':'10.50'}
                             }
                        },
                        
@@ -30,9 +30,9 @@ buttons = {'buttonBuilder':
                         'alfrado':
                             {'price':'9.50'},
                         'mods':
-                           {'sauce':'2.00',
-                            'broccoli':'1.75',
-                            'garlic':'0.50'
+                           {'sauce':{'price':'10.50'},
+                            'broccoli':{'price':'10.50'},
+                            'garlic':{'price':'10.50'}
                             }
                         }
                        },
@@ -44,9 +44,9 @@ buttons = {'buttonBuilder':
                        'rootbeer':
                            {'price':'1.50'},
                        'mods':
-                           {'lemon':'0.50',
-                            'straw':'0.05',
-                            'ice':'0.50'
+                           {'lemon':{'price':'10.50'},
+                            'straw':{'price':'10.50'},
+                            'ice':{'price':'10.50'}
                             }
                        },
                        
@@ -56,9 +56,9 @@ buttons = {'buttonBuilder':
                         'wine':
                             {'price':'6.50'},
                         'mods':
-                           {'glass':'2.00',
-                            'lemon':'1.75',
-                            'shot':'0.50'
+                           {'glass':{'price':'10.50'},
+                            'lemon':{'price':'10.50'},
+                            'shot':{'price':'10.50'}
                             }
                         }
                        

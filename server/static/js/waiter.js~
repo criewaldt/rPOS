@@ -1,4 +1,4 @@
-	/*
+/*
 	DYNAMICALLY CREATE CLICK EVENTS LISTENERS
 	https://toddmotto.com/attaching-event-handlers-to-dynamically-created-javascript-elements/
 
@@ -13,7 +13,8 @@ window.TheOrder;//setup global var for the order
 var AllMyItems;//setup global var for all items that can be ordered
 
 var orderData = {'orderData' : {'burger':{'mods':['cheese', 'bacon']}}};
- 
+var currentBranch;//used in button building
+var parentDiv = 'terminal';//used in button building
                   
 /*used to count items in a list*/
 function CountMyItems(obj) {
@@ -27,65 +28,86 @@ function CountMyItems(obj) {
 /*This Function is used to build buttons on the screen*/
 function ButtonBuilder(JSONdata,targetButton) {
 	targetButton = targetButton || 0;//targetButton is set to 0 as default if no targetButton arg passed
-	console.log(targetButton);	
-	console.log('button builder started');
+
 	
 	//determine parent KEY for this JSON
 	var parentKEY = Object.keys(JSONdata);
 	console.log(parentKEY[0]);
 
-	/*Parent key should ALWAYS be 'buttonBuilder' on inbound setup JSON from server*/
-	if (parentKEY[0] ==="buttonBuilder" ){
+	/*Parent key should ALWAYS be 'buttonBuilder' on initial setup JSON from server*/
+	if (parentKEY[0] ==='buttonBuilder' ){
 		AllMyItems = JSONdata[parentKEY];//global var assignment
-		var ButtonBuilderItems = AllMyItems;//local assignment
-		console.log(ButtonBuilderItems);	
-	}if(parentKEY[0]==='subButtonBuilder' ){
-		console.log(parentKEY);	
-		var ButtonBuilderItems = JSONdata[parentKEY];
-		console.log(ButtonBuilderItems);	
-		}else {console.log("add more keys");}	
+		var ButtonBuilderItems = AllMyItems;//local assignment, removes 'buttonBuilder'
+		console.log(ButtonBuilderItems);//main Object to build buttons for
+	}
 	
 	
 	var totalButtons = CountMyItems(ButtonBuilderItems);
-	console.log("total buttons: " + totalButtons);
 	
-	var myItem = Object.keys(ButtonBuilderItems);
-	console.log("keys: " + myItem);
-
+	var myItemKeys = Object.keys(ButtonBuilderItems);
+	console.log("key names: " + myItemKeys);
+	console.log("key count: " + myItemKeys.length);
 	
-	for (i=0; i<totalButtons;i++) {
-		var newButton = document.createElement("div");
-		if (parentKEY[0]==='buttonBuilder' ) {
-			newButton.setAttribute('class','button');
-		}if(parentKEY[0]==='subButtonBuilder' ){
-			newButton.setAttribute('class','subbutton');		
-		}else {console.log("error setting class");}	
-		
-		newButton.setAttribute('id',myItem[i]);
-		newButton.onclick = clickDynamic;
-		if (parentKEY[0]==='buttonBuilder' ) {
-			document.getElementById('terminal').appendChild(newButton);
-			$('#'+myItem[i]).html(myItem[i].toUpperCase());
-		}if (parentKEY[0]==='subbuttonBuilder' ){
-			console.log("id:" + targetButton.context.id);
-			document.getElementById(targetButton.context.id).appendChild(newButton);
-			$('#'+myItem[i]).html(myItem[i].toUpperCase());
-		};
-			
-			
-		//$('#'+myItem[i]).append("<p>" + myItem[i].toUpperCase()+"</p>");
-		//console.log(Object.keys(AllMyItems[myItem[i]]));
-	};
+		iterate(ButtonBuilderItems);
+	
 	
 	
 };
+var list;
+function iterate(obj, div) {
+	console.log(obj);
+	div = div || parentDiv;//if not passed use primary div
+	list = obj;
+	if (obj instanceof Object) {//check if object
+		var objectKeys = Object.keys(obj);//get objects keys
+		console.log("object keys:");
+		console.log(objectKeys);
+		
+		for (i=0;i<objectKeys.length;i++) {//for each key make a button
+			createButton(objectKeys[i],div);
+			};
+			
+       for(i=0;i<objectKeys.length;i++){//now check if any of the objects have children
+       		if(obj[objectKeys[i]] instanceof Object && !obj[objectKeys[i]].price){
+            	console.log("making sub button for:");
+            	console.log(objectKeys[i]);
+               iterate(obj[objectKeys[i]],objectKeys[i]);
+                      	/*
+                      	console.log("parent object has subObject:");
+                      	console.log(obj[objectKeys[i]]);
+                      	list = obj[objectKeys[i]];
+                          var keyTerms = Object.keys(list);
+                          console.log(keyTerms);
+                                    for(i=0;i<keyTerms.length;i++){
+                                    				div = objectKeys[i];
+                                                createButton(keyTerms[i],div);
+                                                iterate(list);}
+                                    */};
+            };
+     };
+};
+		
+function createButton(id,parentDiv) {
+	console.log("building: ");
+	console.log(id);
+	console.log("under: "+parentDiv);
+	var newButton = document.createElement("div");
+
+	newButton.setAttribute('class','button');
+	newButton.setAttribute('id',id);
+	document.getElementById(parentDiv).appendChild(newButton);
+
+	$('#'+id).html(id.toUpperCase());
+};
 
 function clickDynamic() {
-	console.log($(this));
+	console.log("clickDynamic" +$(this));
 	console.log($(this).context.id);
-	console.log(AllMyItems[$(this).context.id]);
+	var aKey = $(this).context.id;
+	console.log(AllMyItems[aKey]);
 	var subButtons = AllMyItems[$(this).context.id];
 	var targetButton = $(this);
+	console.log("subButton "+AllMyItems[$(this).context.id]);
 	ButtonBuilder({'subButtonBuilder':subButtons},targetButton);
 };
 
@@ -115,10 +137,6 @@ $(document).ready(function(){
 				ButtonBuilder(JSONdata);
 			};
 
-	for (key in AllMyItems) {
-		console.log(AllMyItems[key]);
-
-	};
 			
 	});
 	

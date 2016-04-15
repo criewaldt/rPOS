@@ -13,8 +13,7 @@ window.TheOrder;//setup global var for the order
 var AllMyItems;//setup global var for all items that can be ordered
 
 var orderData = {'orderData' : {'burger':{'mods':['cheese', 'bacon']}}};
-var currentBranch;//used in button building
-var parentDiv = 'terminal';//used in button building
+ 
                   
 /*used to count items in a list*/
 function CountMyItems(obj) {
@@ -38,66 +37,42 @@ function ButtonBuilder(JSONdata,targetButton) {
 	if (parentKEY[0] ==='buttonBuilder' ){
 		AllMyItems = JSONdata[parentKEY];//global var assignment
 		var ButtonBuilderItems = AllMyItems;//local assignment, removes 'buttonBuilder'
-		console.log(ButtonBuilderItems);//main Object to build buttons for
+		console.log(ButtonBuilderItems);
 	}
 	
 	
 	var totalButtons = CountMyItems(ButtonBuilderItems);
+	console.log("total buttons: " + totalButtons);
 	
-	var myItemKeys = Object.keys(ButtonBuilderItems);
-	console.log("key names: " + myItemKeys);
-	console.log("key count: " + myItemKeys.length);
+	var myItem = Object.keys(ButtonBuilderItems);
+	console.log("keys: " + myItem);
+
 	
-		iterate(ButtonBuilderItems);
-	
-	
-	
-};
-var list;
-function iterate(obj, div) {
-	console.log(obj);
-	div = div || parentDiv;//if not passed use primary div
-	list = obj;
-	if (obj instanceof Object) {//check if object
-		var objectKeys = Object.keys(obj);//get objects keys
-		console.log("object keys:");
-		console.log(objectKeys);
+	for (i=0; i<totalButtons;i++) {
+		var newButton = document.createElement("div");
+		if (parentKEY[0]==='buttonBuilder' ) {
+			newButton.setAttribute('class','button');
+		}if(parentKEY[0]==='subButtonBuilder' ){
+			newButton.setAttribute('class','subbutton');		
+		}else {console.log("error setting class");}	
 		
-		for (i=0;i<objectKeys.length;i++) {//for each key make a button
-			createButton(objectKeys[i],div);
-			};
+		newButton.setAttribute('id',myItem[i]);
+		newButton.onclick = clickDynamic;
+		if (parentKEY[0]==='buttonBuilder' ) {
+			document.getElementById('terminal').appendChild(newButton);
+			$('#'+myItem[i]).html(myItem[i].toUpperCase());
+		}if (parentKEY[0]==='subButtonBuilder' ){
+			console.log("id:" + targetButton.context.id);
+			document.getElementById(targetButton.context.id).appendChild(newButton);
+			$('#'+myItem[i]).html(myItem[i].toUpperCase());
+		};
 			
-       for(i=0;i<objectKeys.length;i++){//now check if any of the objects have children
-       		if(obj[objectKeys[i]] instanceof Object && !obj[objectKeys[i]].price){
-            	console.log("making sub button for:");
-            	console.log(objectKeys[i]);
-               iterate(obj[objectKeys[i]],objectKeys[i]);
-                      	/*
-                      	console.log("parent object has subObject:");
-                      	console.log(obj[objectKeys[i]]);
-                      	list = obj[objectKeys[i]];
-                          var keyTerms = Object.keys(list);
-                          console.log(keyTerms);
-                                    for(i=0;i<keyTerms.length;i++){
-                                    				div = objectKeys[i];
-                                                createButton(keyTerms[i],div);
-                                                iterate(list);}
-                                    */}else {continue};
-            };
-     };
-};
-		
-function createButton(id,parentDiv) {
-	console.log("building: ");
-	console.log(id);
-	console.log("under: "+parentDiv);
-	var newButton = document.createElement("div");
-
-	newButton.setAttribute('class','button');
-	newButton.setAttribute('id',id);
-	document.getElementById(parentDiv).appendChild(newButton);
-
-	$('#'+id).html(id.toUpperCase());
+			
+		//$('#'+myItem[i]).append("<p>" + myItem[i].toUpperCase()+"</p>");
+		//console.log(Object.keys(AllMyItems[myItem[i]]));
+	};
+	
+	
 };
 
 function clickDynamic() {
@@ -137,6 +112,10 @@ $(document).ready(function(){
 				ButtonBuilder(JSONdata);
 			};
 
+	for (key in AllMyItems) {
+		console.log(AllMyItems[key]);
+
+	};
 			
 	});
 	
