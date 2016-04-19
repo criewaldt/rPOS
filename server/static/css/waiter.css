@@ -17,8 +17,9 @@
 	line-height: 50px;}
 	
 	
-.subbutton{width:100%;
-	height:70px;
+.subbutton{width:50%;
+	display: none;
+	height:100%;
 	float:none;
 	border-style: solid;
 	border-color: #ffffff;
