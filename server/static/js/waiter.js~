@@ -15,49 +15,66 @@ var orderData = {'orderData' : {'burger':{'mods':['cheese', 'bacon']}}};
 var currentBranch;//used in button building
 var parentDiv = 'terminal';//used in button building
                   
-/*used to count items in a list*/
-function CountMyItems(obj) {
-    var size = 0, key;
-    for (key in obj) {
-        if (obj.hasOwnProperty(key)) size++;
-    };
-    return size;
-};
 
 /*-------These Function are used to build buttons on the screen--------*/
 function ButtonBuilder(obj,parentKey) {
 	var childKey = Object.keys(obj[parentKey]);
 	if (!obj.price) {
 		for (var i=0;i<childKey.length;i++) {
-			createButton(childKey[i],parentKey);
-			ButtonBuilder(obj[parentKey],[childKey[i]]);
+			if (obj[parentKey][childKey[i]].price){
+				HTMLgenerator(childKey[i],parentKey,obj[parentKey][childKey[i]].price)}
+			else {
+			HTMLgenerator(childKey[i],parentKey);
+			ButtonBuilder(obj[parentKey],[childKey[i]]);};
 		};
 	}else{};
 };
 
-function createButton(id,parentDiv) {
-	var newButton = document.createElement("div");
-	if (parentDiv==='buttonBuilder') {
-		parentDiv='terminal';
-		newButton.setAttribute('class','button');
-		newButton.setAttribute('id',id);
-		document.getElementById(parentDiv).appendChild(newButton);
-		$('#'+id).html(id.toUpperCase());
-		$('#'+id).click(function () { 
-			alert('test');
-		});
-		}
-	else{createSubButton(id,parentDiv)};
+function HTMLgenerator(id,parentDiv,price) {
+	console.log(parentDiv);
+	var price = price || false;
+	var newDiv = document.createElement("div");
+	
+	if (price) {
+			createItem(id,parentDiv,price)}
+	else if (parentDiv==='buttonBuilder') {
+			parentDiv='terminal';
+			newDiv.setAttribute('class','button');
+			newDiv.setAttribute('id',id);
+			document.getElementById(parentDiv).appendChild(newDiv);
+			$('#'+id).click (function () { 
+			$(this).children().toggle();});
+			}
+	else {parentDiv=parentDiv[0];
+			newDiv.setAttribute('class','subbutton');
+			newDiv.setAttribute('id',id);
+			document.getElementById(parentDiv).appendChild(newDiv);
+			$('#'+id).click (function () { 
+			$(this).children().toggle();
+			return false;});}
+	
+	console.log(parentDiv);
+	
+	$('#'+id).html(id.toUpperCase());
+	
+	
 
 };
-function createSubButton(id,parentDiv){
-	var newButton = document.createElement("ul");
-	newButton.setAttribute('class','subbutton');
-	newButton.setAttribute('id',id);
-	document.getElementById(parentDiv).appendChild(newButton);
+
+function createItem(id,parentDiv,price){
+	var newItem = document.createElement("li");
+	newItem.setAttribute('class','item');
+	newItem.setAttribute('id',id);
+	newItem.setAttribute('value',price);
+	document.getElementById(parentDiv).appendChild(newItem);
 	$('#'+id).html(id.toUpperCase());
 }
-function menuItem(){};
+function buttonClick(){
+	$(this).children().toggle();};
+	
+function subbuttonClick(){
+	this.children().toggle();
+	return false};
 
 $(document).ready(function(){
 	mySocket = io.connect();//create new websocket, 
@@ -67,7 +84,7 @@ $(document).ready(function(){
 	
 
 	/* EXAMPLE function to send data on click*/
-	$(".button").click(function(event){
+	$("#sendTest").click(function(event){
 		mySocket.send(JSON.stringify(orderData));
 	});
 	
@@ -79,9 +96,9 @@ $(document).ready(function(){
 			This is used to route the JSON to appropriate place through series of IF's*/
 			
 			if (Object.keys(JSONdata)[0] === 'buttonBuilder'){
-				var bb = Object.keys(JSONdata)[0];
 				ButtonBuilder(JSONdata,'buttonBuilder');
 			};
 		});
-	
+
+
 });
