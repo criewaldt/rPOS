@@ -5,9 +5,9 @@
 
 .button{
 	width:50%;
+	float: left;
 	height:70px;//maybe remove this and allow auto size?
 	white-space: nowrap;	
-	float:left;
 	border-style: solid;
 	border-color: #ffffff;
 	background-color:red;
@@ -17,12 +17,23 @@
 	line-height: 50px;}
 	
 	
-.subbutton{width:50%;
-	height:100%;
-	float:none;
+.subbutton{
+	display: none;
+	clear: left;
 	border-style: solid;
 	border-color: #ffffff;
 	background-color:green;
+	text-align: center;
+	vertical-align: middle;
+	text-align: center;
+	line-height: 50px;}
+
+.item{
+	display: none;
+	clear: left;
+	border-style: solid;
+	border-color: #000000;
+	background-color:white;
 	text-align: center;
 	vertical-align: middle;
 	text-align: center;
