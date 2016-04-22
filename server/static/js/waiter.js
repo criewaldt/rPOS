@@ -11,7 +11,7 @@
 window.mySocket;//setup global var for the websocket
 window.TheOrder;//setup global var for the order
 var AllMyItems;//setup global var for all items that can be ordered
-var orderData = {'orderData' : {'burger':{'mods':['cheese', 'bacon']}}};
+var orderData = {'orderData' : {}};
 var currentBranch;//used in button building
 var parentDiv = 'terminal';//used in button building
                   
@@ -56,9 +56,6 @@ function HTMLgenerator(id,parentDiv,price) {
 	console.log(parentDiv);
 	
 	$('#'+id).html(id.toUpperCase());
-	
-	
-
 };
 
 function createItem(id,parentDiv,price){
@@ -68,13 +65,22 @@ function createItem(id,parentDiv,price){
 	newItem.setAttribute('value',price);
 	document.getElementById(parentDiv).appendChild(newItem);
 	$('#'+id).html(id.toUpperCase());
+	$('#'+id).click (function () { 
+			console.log($(this).attr("value"));
+			if (!orderData["orderData"][id]) {
+				orderData["orderData"][id] = 1;}
+			else {orderData["orderData"][id] += 1;}
+			console.log(orderData)
+			addItemToOrder(id+orderData["orderData"][id]);
+			return false;});
 }
-function buttonClick(){
-	$(this).children().toggle();};
-	
-function subbuttonClick(){
-	this.children().toggle();
-	return false};
+function addItemToOrder(itemName){
+	console.log(itemName);
+	var newItem = document.createElement("li");
+	newItem.setAttribute('id',itemName);
+	document.getElementById('orderArea').appendChild(newItem);
+	$('#'+itemName).html(itemName.toUpperCase());
+};
 
 $(document).ready(function(){
 	mySocket = io.connect();//create new websocket, 
