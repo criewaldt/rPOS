@@ -31,7 +31,6 @@ function ButtonBuilder(obj,parentKey) {
 };
 
 function HTMLgenerator(id,parentDiv,price) {
-	console.log(parentDiv);
 	var price = price || false;
 	var newDiv = document.createElement("div");
 	
@@ -53,8 +52,6 @@ function HTMLgenerator(id,parentDiv,price) {
 			$(this).children().toggle();
 			return false;});}
 	
-	console.log(parentDiv);
-	
 	$('#'+id).html(id.toUpperCase());
 };
 
@@ -66,11 +63,9 @@ function createItem(id,parentDiv,price){
 	document.getElementById(parentDiv).appendChild(newItem);
 	$('#'+id).html(id.toUpperCase());
 	$('#'+id).click (function () { 
-			console.log($(this).attr("value"));
 			if (!orderData["orderData"][id]) {
 				orderData["orderData"][id] = 1;}
 			else {orderData["orderData"][id] += 1;}
-			console.log(orderData)
 			addItemToOrder(id+orderData["orderData"][id]);
 			return false;});
 }
@@ -90,7 +85,7 @@ $(document).ready(function(){
 	
 
 	/* EXAMPLE function to send data on click*/
-	$("#sendTest").click(function(event){
+	$("#sendOrder").click(function(event){
 		mySocket.send(JSON.stringify(orderData));
 	});
 	

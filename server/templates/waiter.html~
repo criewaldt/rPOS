@@ -22,14 +22,11 @@
 	 <h1>Waiter Page</h1>
 	 <div class="container-fluid">
 	 <div class="row">
-	 <div class="col-md-4" id="orderArea">ORDER AREA</div>
-	 </div>
-	 <div class="row">
-	<div class="col-md-6" id="terminal"></div>
-	</div>
-	<div class="row">
-	 <div class ="col-md-2" id="sendTest">CLICK SEND TEST JSON</div>
-</div>	
+	 <div class="col-sm-3" id="orderArea">ORDER AREA</div>
+	<div class="col-sm-5" id="terminal"></div>
+
+	 <button type="button" class="btn btn-primary" id="sendOrder"> SEND ORDER</button>
+	</div>	
 	</div>
 </body>
 </html>

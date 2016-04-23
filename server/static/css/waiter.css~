@@ -1,12 +1,8 @@
 #orderArea{
-	height:70px;
 	background-color:yellow;
 	text-align: justify;}
 
 .button{
-	width:50%;
-	float: left;
-	//height:70px;//maybe remove this and allow auto size?
 	white-space: nowrap;	
 	border-style: solid;
 	border-color: #ffffff;
@@ -53,7 +49,6 @@
 	
 #sendTest{
 	position: relative;
-	width:50%;
 	height:70px;
-	background-color: green;
+	background-color: orange;
 }
