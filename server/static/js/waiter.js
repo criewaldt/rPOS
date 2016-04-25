@@ -14,7 +14,7 @@ var AllMyItems;//setup global var for all items that can be ordered
 var orderData = {'orderData' : {}};
 var currentBranch;//used in button building
 var parentDiv = 'terminal';//used in button building
-                  
+var orderTotal = 0;         
 
 /*-------These Function are used to build buttons on the screen--------*/
 function ButtonBuilder(obj,parentKey) {
@@ -42,13 +42,15 @@ function HTMLgenerator(id,parentDiv,price) {
 			newDiv.setAttribute('id',id);
 			document.getElementById(parentDiv).appendChild(newDiv);
 			$('#'+id).click (function () { 
-			$(this).children().toggle();});
-			}
+				if($(this).children().css('display') ==='none')
+					{$(this).children().toggle();}
+				else{$(this).find('*').css('display','none')}});}
 	else {parentDiv=parentDiv[0];
 			newDiv.setAttribute('class','subbutton');
 			newDiv.setAttribute('id',id);
 			document.getElementById(parentDiv).appendChild(newDiv);
 			$('#'+id).click (function () { 
+			$(this).siblings().find('*').css('display','none');
 			$(this).children().toggle();
 			return false;});}
 	
@@ -66,15 +68,17 @@ function createItem(id,parentDiv,price){
 			if (!orderData["orderData"][id]) {
 				orderData["orderData"][id] = 1;}
 			else {orderData["orderData"][id] += 1;}
-			addItemToOrder(id+orderData["orderData"][id]);
+			addItemToOrder(id,orderData["orderData"][id],price);
 			return false;});
 }
-function addItemToOrder(itemName){
-	console.log(itemName);
+function addItemToOrder(Name,count,price){
+	orderTotal += price;
+	var itemName = Name+'-'+count || Name;//legacy, don't really need ||
 	var newItem = document.createElement("li");
 	newItem.setAttribute('id',itemName);
 	document.getElementById('orderArea').appendChild(newItem);
-	$('#'+itemName).html(itemName.toUpperCase());
+	$('#'+itemName).html(Name.toUpperCase() +'  $'+price);
+
 };
 
 $(document).ready(function(){

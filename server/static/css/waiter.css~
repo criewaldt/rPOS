@@ -15,6 +15,7 @@
 	
 .subbutton{
 	display: none;
+	visibility: hidden;
 	clear: left;
 	border-style: solid;
 	border-color: #ffffff;
@@ -47,8 +48,7 @@
 	background-color:yellow;
 	text-align: center;}
 	
-#sendTest{
+#sendOrder{
 	position: relative;
-	height:70px;
 	background-color: orange;
 }
