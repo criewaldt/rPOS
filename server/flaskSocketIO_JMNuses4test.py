@@ -10,12 +10,15 @@ app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
 #when live this JSON should be built by reading an excel sheet
+'''
+NOTE! error right now if keys contain whitespace (my food > my_food)
+'''
 buttons = {'buttonBuilder': 
                 {'entre':
                     {'burgers':
                       {'bbq_burger':
                            {'price':'10.50'},
-                       'veggie burger':
+                       'veggie_burger':
                            {'price':'9.50'},
                        'mods':
                            {'cheese':{'price':'10.50'},
@@ -76,11 +79,12 @@ def index():
 @socketio.on('connect', namespace='/')
 def test_connect():
     print "new connection"
+    
 
 
 @socketio.on('message')
-def handle_message(message):
-    dataIN = json.loads(message)
+def handle_message(data):
+    dataIN = json.loads(data)
     print dataIN
     print dataIN.itervalues().next()
     print dataIN.iterkeys().next()
@@ -89,12 +93,11 @@ def handle_message(message):
         print "button setup sent"
 
     else:
-        print message
-        print type(message)
+        print data
+        print type(data)
         print dataIN
         print type(dataIN)
     
-   
 
 if __name__ == '__main__':
     socketio.run(app,host='0.0.0.0',port=8000)

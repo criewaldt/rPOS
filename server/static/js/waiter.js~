@@ -18,12 +18,16 @@ var orderTotal = 0;
 
 /*-------These Function are used to build buttons on the screen--------*/
 function ButtonBuilder(obj,parentKey) {
+	//get the keys of the parentKey branch
 	var childKey = Object.keys(obj[parentKey]);
-	if (!obj.price) {
+	//properties of the object: price, modification, etc are NOT objects
+	if (obj instanceof Object) {
 		for (var i=0;i<childKey.length;i++) {
+			//price property means it can be added to the order
 			if (obj[parentKey][childKey[i]].price){
 				HTMLgenerator(childKey[i],parentKey,obj[parentKey][childKey[i]].price)}
 			else {
+			//create more subbuttons for the current branch
 			HTMLgenerator(childKey[i],parentKey);
 			ButtonBuilder(obj[parentKey],[childKey[i]]);};
 		};
@@ -41,6 +45,7 @@ function HTMLgenerator(id,parentDiv,price) {
 			newDiv.setAttribute('class','button');
 			newDiv.setAttribute('id',id);
 			document.getElementById(parentDiv).appendChild(newDiv);
+			//must add click functions here else since elements are dynamically created they wont bind
 			$('#'+id).click (function () { 
 				if($(this).children().css('display') ==='none')
 					{$(this).children().toggle();}
@@ -78,20 +83,27 @@ function addItemToOrder(Name,count,price){
 	newItem.setAttribute('id',itemName);
 	document.getElementById('orderArea').appendChild(newItem);
 	$('#'+itemName).html(Name.toUpperCase() +'  $'+price);
-	 updateOrderTotal();
+
 };
-function updateOrderTotal() {$('#orderArea').html('$'+orderTotal);}
+
 $(document).ready(function(){
 	mySocket = io.connect();//create new websocket, 
 	
 	/* ON LOAD build the buttons on the page*/
 	mySocket.send(JSON.stringify({'buttonBuilder':1}));
+
 	
+	document.getElementById('sendOrder').onclick = function (){
+		console.log('click');
+		//mySocket.send(JSON.stringify(orderData));
+		mySocket.send(JSON.stringify(orderData));
+	};
 
 	/* EXAMPLE function to send data on click*/
+	/*
 	$("#sendOrder").click(function(event){
 		mySocket.send(JSON.stringify(orderData));
-	});
+	});*/
 	
 	/* FUNCTION TO READ INBOUND DATA*/
 	mySocket.on('message', function(msg) {
