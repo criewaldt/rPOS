@@ -12,11 +12,13 @@
 	text-align: center;
 	line-height: 50px;}
 	
-	
+.orderArea{
+	position: relative;
+}
 .subbutton{
 	display: none;
-	visibility: hidden;
-	clear: left;
+	width: 25%;
+	float: left;
 	border-style: solid;
 	border-color: #ffffff;
 	background-color:green;

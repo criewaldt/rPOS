@@ -1,4 +1,5 @@
 #http://blog.miguelgrinberg.com/post/easy-websockets-with-flask-and-gevent
+#http://flask-socketio.readthedocs.org/en/latest/
 from flask import Flask, render_template, session, request
 from flask_socketio import SocketIO
 from flask.ext.socketio import emit, send
@@ -11,7 +12,7 @@ socketio = SocketIO(app)
 
 #when live this JSON should be built by reading an excel sheet
 '''
-NOTE! error right now if keys contain whitespace (my food > my_food)
+NOTE! error right now if keys contain whitespace "my food" >change to> "my_food"
 '''
 buttons = {'buttonBuilder': 
                 {'entre':
