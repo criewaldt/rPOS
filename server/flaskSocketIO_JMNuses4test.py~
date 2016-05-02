@@ -10,12 +10,15 @@ app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
 #when live this JSON should be built by reading an excel sheet
+'''
+NOTE! error right now if keys contain whitespace "my food" >change to> "my_food"
+'''
 buttons = {'buttonBuilder': 
                 {'entre':
                     {'burgers':
                       {'bbq_burger':
                            {'price':'10.50'},
-                       'veggie burger':
+                       'veggie_burger':
                            {'price':'9.50'},
                        'mods':
                            {'cheese':{'price':'10.50'},
