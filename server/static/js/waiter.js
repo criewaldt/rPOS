@@ -88,7 +88,7 @@ createItem(id,parentDiv,price):
 */
 function createItem(id,parentDiv,price){
 	var nm = id.substring(id.lastIndexOf(ElementId_Spacer)+1);
-	var newItem = document.createElement("ul");
+	var newItem = document.createElement("p");
 	newItem.setAttribute('class','item');
 	newItem.setAttribute('id',id);
 	newItem.setAttribute('value',price);
@@ -109,7 +109,7 @@ function addItemToOrder(Name,count,price){
 	orderTotal += parseFloat(price);
 	console.log(orderTotal);
 	var itemName = Name+'-'+count || Name;//legacy, don't really need ||
-	var newItem = document.createElement("li");
+	var newItem = document.createElement("p");
 	newItem.setAttribute('id',itemName);
 	document.getElementById('orderArea').appendChild(newItem);
 	$('#'+itemName).html(Name.toUpperCase() +'  $'+price);
@@ -124,15 +124,16 @@ display_CategoryView(parentDiv):
 	OUT: nothing, however html is shuffled and displayed
 */
 function display_CategoryView(parentDiv) {
-	/*
-	http://stackoverflow.com/questions/20910147/how-to-move-all-html-element-children-to-another-parent-using-javascript
-	*/
-	var id = parentDiv.attr('id');
-	var newParent = document.getElementById('categoryView');
-	var oldParent = document.getElementById(id);
-	
-	while (oldParent.childNodes.length > 0) {
-		newParent.appendChild(oldParent.childNodes[0]);};
+	$('.button').removeClass("ActiveCategory");
+	//remove 'active' class on previous parent
+	var newParent = $('#categoryView');
+	if(newParent.children()){newParent.empty()};
+	//clone(true) takes all attached handlers too, see docs
+	parentDiv.children().clone(true).appendTo(newParent);
+   if(newParent.children().css('display') ==='none'){
+			newParent.children().toggle();};
+	parentDiv.addClass("ActiveCategory");
+
 };
 
 $(document).ready(function(){
@@ -171,6 +172,7 @@ $(document).ready(function(){
 						else {orderData["orderData"][nm] += 1;}
 							addItemToOrder(nm,orderData["orderData"][nm],price);
 							event.stopPropagation();});
+			
 			/*---- SUBBUTTON Class Click Event-----*/	
 				$('.subbutton').click (function (event) { 
 				$(this).children().toggle();
@@ -182,11 +184,6 @@ $(document).ready(function(){
 			/*---- BUTTON Class Click Event-----*/	
 				$('.button').click (function () {
 				display_CategoryView($(this));
-				console.log($(this));
-				if($(this).children().css('display') ==='none'){
-					$(this).children().toggle();}
-				else{	
-					$(this).find('*').css('display','none')};// find('*') selects all children
 					});
 				};			
 			

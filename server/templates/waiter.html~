@@ -20,11 +20,12 @@
 	
 	<body>
 	 <h1>Waiter Page</h1>
-	 <div class="row">
+
 	 <div class="col-xs-12 orderArea" id="orderTotal">Total:  $0.00</div>
-	 <div class="col-xs-4 orderArea" id="orderArea"></div>
-	<div class="col-xs-8" id="terminal"></div>
-	</div>	
+	 <div class="col-xs-3 orderArea" id="orderArea"></div>
+	<div class="col-xs-3" id="terminal"></div>
+	<div class="col-xs-6" id="categoryView"></div>
+
 <button type="button" class="btn btn-primary" id="sendOrder">SEND ORDER</button>
 </body>
 </html>
