@@ -17,7 +17,9 @@
 }
 .subbutton{
 	display: none;
-	clear: left;
+	width: 25%;
+	float: left;
+	clear: right;
 	border-style: solid;
 	border-color: #ffffff;
 	background-color:green;
@@ -28,7 +30,7 @@
 
 .item{
 	display: none;
-	clear: left;
+	clear: right;
 	border-style: solid;
 	border-color: #000000;
 	background-color:white;
@@ -37,9 +39,9 @@
 	text-align: center;
 	line-height: 50px;}
 		
-.button:hover{
+.ActiveCategory{
 	background-color:blue;
-	text-align: center;}
+	}
 	
 .subbutton:hover{
 	background-color:red;
