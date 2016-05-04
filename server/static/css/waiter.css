@@ -1,25 +1,33 @@
 #orderArea{
 	background-color:yellow;
 	text-align: justify;}
-
+#terminal{
+padding-right: 0px;
+}
+#itemView{
+	width: 100%;
+	display: block;
+}
 .button{
+	overflow:hidden;
 	white-space: nowrap;	
-	border-style: solid;
+	border-bottom-style: solid;
 	border-color: #ffffff;
 	background-color:red;
 	text-align: center;
 	vertical-align: middle;
 	text-align: center;
 	line-height: 50px;}
-	
+
+
 .orderArea{
 	position: relative;
 }
 .subbutton{
+	 overflow:hidden;
 	display: none;
 	width: 25%;
 	float: left;
-	clear: right;
 	border-style: solid;
 	border-color: #ffffff;
 	background-color:green;
@@ -29,7 +37,9 @@
 	line-height: 50px;}
 
 .item{
+	overflow:hidden;
 	display: none;
+	width: 25%;
 	clear: right;
 	border-style: solid;
 	border-color: #000000;
@@ -42,10 +52,10 @@
 .ActiveCategory{
 	background-color:blue;
 	}
-	
-.subbutton:hover{
-	background-color:red;
-	text-align: center;}
+.ActiveItem{
+	background-color:yellow;
+	}	
+
 	
 .item:hover{
 	background-color:yellow;
