@@ -124,16 +124,31 @@ display_CategoryView(parentDiv):
 	OUT: nothing, however html is shuffled and displayed
 */
 function display_CategoryView(parentDiv) {
-	$('.button').removeClass("ActiveCategory");
-	//remove 'active' class on previous parent
+	$('.button').removeClass("ActiveCategory");//remove 'active' class on previous parent
 	var newParent = $('#categoryView');
-	if(newParent.children()){newParent.empty()};
+	newParent.children($('.subbutton')).empty();
+	//newParent.not($('#categoryView')).remove();
 	//clone(true) takes all attached handlers too, see docs
-	parentDiv.children().clone(true).appendTo(newParent);
-   if(newParent.children().css('display') ==='none'){
-			newParent.children().toggle();};
+	parentDiv.children().clone(true).prependTo(newParent);
+	
+   if(newParent.children('.subbutton').css('display') ==='none'){
+			newParent.children('.subbutton').toggle();};
+			
 	parentDiv.addClass("ActiveCategory");
 
+};
+
+function display_ItemView(parentDiv) {
+	$('.subbutton').removeClass("ActiveItem");
+	var newParent = $('#itemView');
+	newParent.empty();
+	parentDiv.children().clone(true).prependTo(newParent);
+	console.log(newParent.children('.item'));
+	if(newParent.children().css('display') ==='none'){
+			newParent.children().toggle();};
+			
+	parentDiv.addClass("ActiveItem");
+	
 };
 
 $(document).ready(function(){
@@ -175,8 +190,11 @@ $(document).ready(function(){
 			
 			/*---- SUBBUTTON Class Click Event-----*/	
 				$('.subbutton').click (function (event) { 
-				$(this).children().toggle();
-				$(this).siblings().find('*').css('display','none');
+				
+				display_ItemView($(this));				
+
+				//$(this).children().toggle();
+				//$(this).siblings().find('*').css('display','none');
 				event.stopPropagation();
 				//return false; //should also work, but sometimes is failing
 				});
