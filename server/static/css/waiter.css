@@ -6,7 +6,6 @@ padding-right: 0px;
 }
 #itemView{
 	width: 100%;
-	display: block;
 }
 .button{
 	overflow:hidden;
@@ -26,7 +25,7 @@ padding-right: 0px;
 .subbutton{
 	 overflow:hidden;
 	display: none;
-	width: 25%;
+	width: 50%;
 	float: left;
 	border-style: solid;
 	border-color: #ffffff;
@@ -39,7 +38,7 @@ padding-right: 0px;
 .item{
 	overflow:hidden;
 	display: none;
-	width: 25%;
+	width: 100%;
 	clear: right;
 	border-style: solid;
 	border-color: #000000;

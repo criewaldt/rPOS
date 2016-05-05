@@ -107,7 +107,6 @@ addItemToOrder(Name,count,price):
 */
 function addItemToOrder(Name,count,price){
 	orderTotal += parseFloat(price);
-	console.log(orderTotal);
 	var itemName = Name+'-'+count || Name;//legacy, don't really need ||
 	var newItem = document.createElement("p");
 	newItem.setAttribute('id',itemName);
@@ -126,8 +125,8 @@ display_CategoryView(parentDiv):
 function display_CategoryView(parentDiv) {
 	$('.button').removeClass("ActiveCategory");//remove 'active' class on previous parent
 	var newParent = $('#categoryView');
-	newParent.children($('.subbutton')).empty();
-	//newParent.not($('#categoryView')).remove();
+	newParent.find('*').not('#itemView').remove();
+
 	//clone(true) takes all attached handlers too, see docs
 	parentDiv.children().clone(true).prependTo(newParent);
 	
@@ -138,14 +137,20 @@ function display_CategoryView(parentDiv) {
 
 };
 
+function display_ItemModifiers(mods) {
+	mods.children().toggle();
+
+};
+
 function display_ItemView(parentDiv) {
+	console.log(parentDiv);
 	$('.subbutton').removeClass("ActiveItem");
 	var newParent = $('#itemView');
 	newParent.empty();
-	parentDiv.children().clone(true).prependTo(newParent);
-	console.log(newParent.children('.item'));
-	if(newParent.children().css('display') ==='none'){
-			newParent.children().toggle();};
+	parentDiv.children().not("[name='mods']").clone(true).prependTo(newParent);
+	parentDiv.children("[name='mods']").clone(true).appendTo(newParent);
+	newParent.children().css('display','block');
+
 			
 	parentDiv.addClass("ActiveItem");
 	
@@ -180,7 +185,9 @@ $(document).ready(function(){
 			
 			/*---- ITEMS Class Click Event-----*/
 			$('.item').click (function (event) { 
+
 					var nm = $(this).attr('name');
+					console.log(nm);
 					var price = $(this).attr('value');
 						if (!orderData["orderData"][nm]) {
 							orderData["orderData"][nm] = 1;}
@@ -189,15 +196,18 @@ $(document).ready(function(){
 							event.stopPropagation();});
 			
 			/*---- SUBBUTTON Class Click Event-----*/	
-				$('.subbutton').click (function (event) { 
-				
+				$('.subbutton').not("[name='mods']").click (function (event) { 
 				display_ItemView($(this));				
-
-				//$(this).children().toggle();
-				//$(this).siblings().find('*').css('display','none');
 				event.stopPropagation();
 				//return false; //should also work, but sometimes is failing
 				});
+			/*--special-- SUBBUTTON Class Name='mods' Click Event-----*/	
+			$("[name='mods']").click (function (event) { 
+				display_ItemModifiers($(this));				
+				event.stopPropagation();
+				//return false; //should also work, but sometimes is failing
+				});
+			
 			
 			/*---- BUTTON Class Click Event-----*/	
 				$('.button').click (function () {

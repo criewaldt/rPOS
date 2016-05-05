@@ -6,7 +6,6 @@ padding-right: 0px;
 }
 #itemView{
 	width: 100%;
-	display: block;
 }
 .button{
 	overflow:hidden;
@@ -39,6 +38,7 @@ padding-right: 0px;
 .item{
 	overflow:hidden;
 	display: none;
+	width: 100%;
 	clear: right;
 	border-style: solid;
 	border-color: #000000;
