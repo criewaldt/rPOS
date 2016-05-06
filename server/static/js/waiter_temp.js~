@@ -38,15 +38,15 @@ function ButtonBuilder(JSONdata,targetButton) {
 		AllMyItems = JSONdata[parentKEY];//global var assignment
 		var ButtonBuilderItems = AllMyItems;//local assignment, removes 'buttonBuilder'
 		console.log(ButtonBuilderItems);
-	}else {console.log("Error JSON key was not 'buttonBuilder");
+	}
 	
 	
 	var totalButtons = CountMyItems(ButtonBuilderItems);
-	console.log("total keys: " + totalButtons);
+	console.log("total buttons: " + totalButtons);
 	
 	var myItem = Object.keys(ButtonBuilderItems);
 	console.log("keys: " + myItem);
-	console.log("total keys: " + myItem.length);
+
 	
 	for (i=0; i<totalButtons;i++) {
 		var newButton = document.createElement("div");

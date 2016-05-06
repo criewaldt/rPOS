@@ -1,6 +1,12 @@
 #orderArea{
+	height: 100%;
 	background-color:yellow;
 	text-align: justify;}
+	
+#orderTotal{
+float: right;
+text-align: right;
+}
 #terminal{
 padding-right: 0px;
 }
@@ -8,11 +14,14 @@ padding-right: 0px;
 	width: 100%;
 }
 .button{
-	overflow:hidden;
-	white-space: nowrap;	
+	background: -webkit-radial-gradient(#FF5050, #FF0A0A);
+	background: radial-gradient(#FF5050, #FF0A0A);
+	border-radius: 15px;
 	border-bottom-style: solid;
 	border-color: #ffffff;
-	background-color:red;
+	
+	overflow:hidden;
+	white-space: nowrap;	
 	text-align: center;
 	vertical-align: middle;
 	text-align: center;
@@ -23,36 +32,44 @@ padding-right: 0px;
 	position: relative;
 }
 .subbutton{
-	 overflow:hidden;
+	background: -webkit-radial-gradient(#FFA62F, #FBB117);
+	background: radial-gradient(#FFA62F, #FBB117);
+	border-radius: 15px;
+	border-style: solid;
+	border-color: #ffffff;
+	
+	overflow:hidden;
 	display: none;
 	width: 50%;
 	float: left;
-	border-style: solid;
-	border-color: #ffffff;
-	background-color:green;
 	text-align: center;
 	vertical-align: middle;
 	text-align: center;
 	line-height: 50px;}
 
 .item{
-	overflow:hidden;
-	display: none;
-	width: 100%;
-	clear: right;
 	border-style: solid;
 	border-color: #000000;
 	background-color:white;
+	border-radius: 15px;
+	
+	overflow:hidden;
+	display: none;
+	width: 25%;
+	clear: right;
 	text-align: center;
 	vertical-align: middle;
 	text-align: center;
 	line-height: 50px;}
+	
 		
 .ActiveCategory{
-	background-color:blue;
+	background: -webkit-radial-gradient(blue, blue);
+	background: radial-gradient(blue, blue);
 	}
 .ActiveItem{
-	background-color:yellow;
+	background: -webkit-radial-gradient(yellow, orange);
+	background: radial-gradient(yellow, orange);
 	}	
 
 	
@@ -61,6 +78,7 @@ padding-right: 0px;
 	text-align: center;}
 	
 #sendOrder{
+	float: right;
 	position: relative;
 	background-color: orange;
 }
