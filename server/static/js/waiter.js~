@@ -138,11 +138,15 @@ function display_CategoryView(parentDiv) {
 };
 
 function display_ItemModifiers(mods) {
+	var id = mods.context.id;
+	var xtest = document.getElementById(id).childNodes;
+	console.log(xtest);
+	mods.children().css('width','50%');
 	mods.children().toggle();
-	//var newParent = $('#itemView');
-	//var showMods = mods.children().clone(true);
-	//showMods.toggle();
-	//showMods.appendTo(newParent);
+	
+	var newItem = document.createElement("div");
+	console.log(xtest[1].id);
+	document.getElementById(xtest[1].id).appendChild(newItem);	
 };
 
 function display_ItemView(parentDiv) {
@@ -153,8 +157,7 @@ function display_ItemView(parentDiv) {
 	parentDiv.children().not("[name='mods']").clone(true).prependTo(newParent);
 	parentDiv.children("[name='mods']").clone(true).appendTo(newParent);
 	newParent.children().css('display','block');
-	/*if(newParent.children().css('display') ==='none'){
-			newParent.children().not($('#itemView')).toggle();};*/
+
 			
 	parentDiv.addClass("ActiveItem");
 	

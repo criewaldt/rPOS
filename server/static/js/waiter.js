@@ -64,17 +64,19 @@ HTMLgenerator():
 */
 function HTMLgenerator(id,parentDiv,price) {
 	var price = price || false;//menu buttons have no price, only items do
-	if (price) {createItem(id,parentDiv,price)};
 	if (parentDiv==="") {parentDiv='terminal';};
-	//isolate just the name of the item
-	var nm = id.substring(id.lastIndexOf(ElementId_Spacer)+1);
-	var newDiv = document.createElement("div");
-	document.getElementById(parentDiv).appendChild(newDiv);
-	newDiv.setAttribute('id',id);
-	newDiv.setAttribute('name',nm);
-	document.getElementById(id).innerHTML = nm.toUpperCase();
-	if (parentDiv==='terminal') {newDiv.setAttribute('class','button'); }
-	else {newDiv.setAttribute('class','subbutton'); }
+	if (price) {createItem(id,parentDiv,price)}
+	else {
+		//isolate just the name of the item
+		var nm = id.substring(id.lastIndexOf(ElementId_Spacer)+1);
+		var newDiv = document.createElement("div");
+		document.getElementById(parentDiv).appendChild(newDiv);
+		newDiv.setAttribute('id',id);
+		newDiv.setAttribute('name',nm);
+		document.getElementById(id).innerHTML = nm.toUpperCase();
+			if (parentDiv==='terminal') {newDiv.setAttribute('class','button'); }
+			else {newDiv.setAttribute('class','subbutton'); }
+		}
 };
 
 /*
@@ -117,29 +119,46 @@ function addItemToOrder(Name,count,price){
 /*
 display_CategoryView(parentDiv):
 	IN: parentDiv - the element was clicked $(this)
-	PURPOSE: take the nested content of the div element clicked.
-		which is some category of items.  Display the content in div
-		called 'categoryView' which is the far left column in view
+	PURPOSE: If there is content in 'categoryView' div, remove
+		it and return to it's correct parent.  Then take the nested content
+		 of the 'terminal' element clicked.
+		which is some category of items.  Display the content in 
+		 'categoryView' which is the far middle column in view
 	OUT: nothing, however html is shuffled and displayed
 */
 function display_CategoryView(parentDiv) {
 	$('.button').removeClass("ActiveCategory");//remove 'active' class on previous parent
 	var newParent = $('#categoryView');
+	
+	if (newParent.children()[0].id !== 'itemView') {
+		var parentCategory = newParent.children()[0].id;
+		var end = parentCategory.indexOf("-");
+		parentCategory = parentCategory.substring(0,end);
+		newParent.find('*').css('display','none');
+		newParent.find('*').not('#itemView').clone(true).appendTo($('#'+parentCategory));
+	};
 	newParent.find('*').not('#itemView').remove();
 
 	//clone(true) takes all attached handlers too, see docs
 	parentDiv.children().clone(true).prependTo(newParent);
+	parentDiv.children().remove();
 	
    if(newParent.children('.subbutton').css('display') ==='none'){
 			newParent.children('.subbutton').toggle();};
 			
 	parentDiv.addClass("ActiveCategory");
-
 };
 
 function display_ItemModifiers(mods) {
+	var id = mods.context.id;
+	var xtest = document.getElementById(id).childNodes;
+	console.log(xtest);
+	mods.children().css('width','50%');
 	mods.children().toggle();
-
+	
+	var newItem = document.createElement("div");
+	console.log(xtest[1].id);
+	document.getElementById(xtest[1].id).appendChild(newItem);	
 };
 
 function display_ItemView(parentDiv) {
@@ -151,9 +170,7 @@ function display_ItemView(parentDiv) {
 	parentDiv.children("[name='mods']").clone(true).appendTo(newParent);
 	newParent.children().css('display','block');
 
-			
 	parentDiv.addClass("ActiveItem");
-	
 };
 
 $(document).ready(function(){
