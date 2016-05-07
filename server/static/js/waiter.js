@@ -9,8 +9,7 @@
 	*/
 
 window.mySocket;//setup global var for the websocket
-window.TheOrder;//setup global var for the order
-var AllMyItems;//setup global var for all items that can be ordered
+var bbJSON;
 var orderData = {'orderData' : {}};
 var orderTotal = 0.00;      
 var ElementId_Spacer = "-";   //space char in element name attr to denote location in buttonBuilder json
@@ -27,7 +26,7 @@ ButtonBuilder():
 */
 
 function ButtonBuilder(obj,parentKey,id) {
-
+	console.log(PageIsReady);
 	if (!PageIsReady) {PageIsReady = 2;}
 	else {PageIsReady += 1;};
 
@@ -42,15 +41,17 @@ function ButtonBuilder(obj,parentKey,id) {
 			var jsonID = id+ElementId_Spacer+[childKey[i]];
 			//if id has '.' as first character, skip over it so a letter is first
 			if (jsonID.charAt(0)==ElementId_Spacer) {jsonID = jsonID.substring(1);};
+			//Actual Items
 			if (obj[parentKey][childKey[i]].price){
 				HTMLgenerator(jsonID,id,obj[parentKey][childKey[i]].price)}
+			//subButtons			
 			else {
 			HTMLgenerator(jsonID,id);
 			ButtonBuilder(obj[parentKey],[childKey[i]],jsonID);};
 		};
 	}else{return;};
 	PageIsReady -= 1;
-	if(PageIsReady===1){PageIsReady===true;}
+	if(PageIsReady===1){PageIsReady===true;assign_ClickHandlers();}
 	
 };
 /*
@@ -127,25 +128,31 @@ display_CategoryView(parentDiv):
 	OUT: nothing, however html is shuffled and displayed
 */
 function display_CategoryView(parentDiv) {
-	$('.button').removeClass("ActiveCategory");//remove 'active' class on previous parent
-	var newParent = $('#categoryView');
+	var previousSelection = $('.ActiveCategory');
+	console.log(previousSelection.length);
 	
-	if (newParent.children()[0].id !== 'itemView') {
-		var parentCategory = newParent.children()[0].id;
-		var end = parentCategory.indexOf("-");
-		parentCategory = parentCategory.substring(0,end);
-		newParent.find('*').css('display','none');
-		newParent.find('*').not('#itemView').clone(true).appendTo($('#'+parentCategory));
-	};
+	if (previousSelection.length >0) {
+		var id = previousSelection[0].id;
+		console.log(bbJSON["buttonBuilder"][id]);
+		PageIsReady = false;
+		ButtonBuilder(bbJSON["buttonBuilder"],id,id);
+		};
+
+	var newParent = $('#categoryView');
 	newParent.find('*').not('#itemView').remove();
+
 
 	//clone(true) takes all attached handlers too, see docs
 	parentDiv.children().clone(true).prependTo(newParent);
 	parentDiv.children().remove();
-	
-   if(newParent.children('.subbutton').css('display') ==='none'){
-			newParent.children('.subbutton').toggle();};
+	/*
+if(newParent.children('.subbutton').css('display') ==='none'){
+			newParent.children('.subbutton').toggle();};	
+	*/
+   if(newParent.children().css('display') ==='none'){
+			newParent.children().toggle();};
 			
+	previousSelection.removeClass("ActiveCategory");//remove 'active' class on previous parent	
 	parentDiv.addClass("ActiveCategory");
 };
 
@@ -173,34 +180,8 @@ function display_ItemView(parentDiv) {
 	parentDiv.addClass("ActiveItem");
 };
 
-$(document).ready(function(){
-	mySocket = io.connect();//create new websocket, 
-	
-	/* ON LOAD sending a json with key term 'buttonBuilder'
-	which will cause server to respond with a master json used to
-	build the buttons on the page*/
-	mySocket.send(JSON.stringify({'buttonBuilder':1}));
-	
-	document.getElementById('sendOrder').onclick = function (){
-		mySocket.send(JSON.stringify(orderData));
-	};
-
-	/* FUNCTION TO READ INBOUND DATA*/
-	mySocket.on('message', function(msg) {
-			var JSONdata = JSON.parse(msg);
-			console.log(JSONdata);
-			/* ALL JSON data coming from server will have one parent key in the tree.  
-			This is used to route the JSON to appropriate place through series of IF's*/
-			
-			if (Object.keys(JSONdata)[0] === 'buttonBuilder'){
-				ButtonBuilder(JSONdata,'buttonBuilder');
-				//PageIsReady is 1 when all buttons are built
-			};
-
-			if(PageIsReady){
-			//ONLY ASSIGN CLICK HANDLERS WHEN ALL ELEMENTS ARE BUILT IN HTML
-			
-			/*---- ITEMS Class Click Event-----*/
+function assign_ClickHandlers() {
+				/*---- ITEMS Class Click Event-----*/
 			$('.item').click (function (event) { 
 
 					var nm = $(this).attr('name');
@@ -225,12 +206,35 @@ $(document).ready(function(){
 				//return false; //should also work, but sometimes is failing
 				});
 			
-			
 			/*---- BUTTON Class Click Event-----*/	
 				$('.button').click (function () {
 				display_CategoryView($(this));
 					});
-				};			
+};
+
+$(document).ready(function(){
+	mySocket = io.connect();//create new websocket, 
+	
+	/* ON LOAD sending a json with key term 'buttonBuilder'
+	which will cause server to respond with a master json used to
+	build the buttons on the page*/
+	mySocket.send(JSON.stringify({'buttonBuilder':1}));
+	
+	document.getElementById('sendOrder').onclick = function (){
+		mySocket.send(JSON.stringify(orderData));
+	};
+
+	/* FUNCTION TO READ INBOUND DATA*/
+	mySocket.on('message', function(msg) {
+			var JSONdata = JSON.parse(msg);
+			console.log(JSONdata);
+			/* ALL JSON data coming from server will have one parent key in the tree.  
+			This is used to route the JSON to appropriate place through series of IF's*/
+			
+			if (Object.keys(JSONdata)[0] === 'buttonBuilder'){
+				bbJSON = JSONdata;
+				ButtonBuilder(JSONdata,'buttonBuilder');
+			};
 			
 		});
 		

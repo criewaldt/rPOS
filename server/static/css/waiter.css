@@ -27,7 +27,7 @@ padding-right: 0px;
 	text-align: center;
 	line-height: 50px;}
 
-
+.subbutton[name="mods"]{width: 100%;}
 .orderArea{
 	position: relative;
 }
