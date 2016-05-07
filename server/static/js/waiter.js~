@@ -108,15 +108,33 @@ addItemToOrder(Name,count,price):
 				under orderArea.
 	OUT: nothing, however html item element is created in view
 */
-function addItemToOrder(Name,count,price){
+function addItemToOrder(Name,count,price,mod){
+	var modify = mod || false;
+	if (!modify) {
 	orderTotal += parseFloat(price);
-	var itemName = Name+'-'+count || Name;//legacy, don't really need ||
-	var newItem = document.createElement("p");
+	var itemName = Name+'-'+count
+	var newItem = document.createElement("ul");
 	newItem.setAttribute('id',itemName);
 	document.getElementById('orderArea').appendChild(newItem);
 	$('#'+itemName).html(Name.toUpperCase() +'  $'+price);
 	$('#orderTotal').html('Total:  $'+orderTotal.toFixed(2));//force two decimal spots	
+	}else {modifyItemInOrder(Name,count,price);};
 };
+
+function modifyItemInOrder(Name,count,price) {
+	var itemToModify = $('#orderArea').children().last();
+	var itemName = Name+'-'+count
+	var newItem = document.createElement("li");
+	var price = parseFloat(price);
+	orderTotal += price;
+	
+	newItem.setAttribute('id',itemName);
+	itemToModify.append(newItem);
+	$('#'+itemName).html(Name.toUpperCase() +'  $'+price);
+	$('#orderTotal').html('Total:  $'+orderTotal.toFixed(2));
+}	
+	
+	
 /*
 display_CategoryView(parentDiv):
 	IN: parentDiv - the element that was clicked $(this)
@@ -148,15 +166,8 @@ function display_CategoryView(parentDiv) {
 };
 
 function display_ItemModifiers(mods) {
-	var id = mods.context.id;
-	var xtest = document.getElementById(id).childNodes;
-	console.log(xtest);
 	mods.children().css('width','50%');
-	mods.children().toggle();
-	
-	var newItem = document.createElement("div");
-	console.log(xtest[1].id);
-	document.getElementById(xtest[1].id).appendChild(newItem);	
+	mods.children().toggle();	
 };
 
 function display_ItemView(parentDiv) {
@@ -181,35 +192,40 @@ function display_ItemView(parentDiv) {
 };
 
 function assign_ClickHandlers() {
-				/*---- ITEMS Class Click Event-----*/
+	
+		 /*---- ITEMS Class Click Event-----*/
 			$('.item').click (function (event) { 
+			var mods = false;
+			if($(this).parent().attr('name') === 'mods'){
+				mods = 'mods';
+				};
 
-					var nm = $(this).attr('name');
-					console.log(nm);
-					var price = $(this).attr('value');
-						if (!orderData["orderData"][nm]) {
+				var nm = $(this).attr('name');
+				var price = $(this).attr('value');
+					if (!orderData["orderData"][nm]) {
 							orderData["orderData"][nm] = 1;}
-						else {orderData["orderData"][nm] += 1;}
-							addItemToOrder(nm,orderData["orderData"][nm],price);
-							event.stopPropagation();});
+					else {orderData["orderData"][nm] += 1;}
+					
+				addItemToOrder(nm,orderData["orderData"][nm],price,mods);
+				event.stopPropagation();
+				});
 			
 			/*---- SUBBUTTON Class Click Event-----*/	
-				$('.subbutton').not("[name='mods']").click (function (event) { 
-				display_ItemView($(this));				
+			$('.subbutton').not("[name='mods']").click (function (event) { 
+					display_ItemView($(this));				
 				event.stopPropagation();
-				//return false; //should also work, but sometimes is failing
 				});
+				
 			/*--special-- SUBBUTTON Class Name='mods' Click Event-----*/	
 			$("[name='mods']").click (function (event) { 
-				display_ItemModifiers($(this));				
+					display_ItemModifiers($(this));				
 				event.stopPropagation();
-				//return false; //should also work, but sometimes is failing
 				});
 			
 			/*---- BUTTON Class Click Event-----*/	
-				$('.button').click (function () {
-				display_CategoryView($(this));
-					});
+			$('.button').click (function () {
+					display_CategoryView($(this));
+				});
 };
 
 $(document).ready(function(){
@@ -221,6 +237,7 @@ $(document).ready(function(){
 	mySocket.send(JSON.stringify({'buttonBuilder':1}));
 	
 	document.getElementById('sendOrder').onclick = function (){
+		alert();
 		mySocket.send(JSON.stringify(orderData));
 	};
 
@@ -237,6 +254,9 @@ $(document).ready(function(){
 			};
 			
 		});
-		
+	
+	//make OrderArea size match screen
+	$('#orderArea').css('height',screen.height-(screen.height/2));
+	console.log(screen.height);
 
 });

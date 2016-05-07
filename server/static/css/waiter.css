@@ -1,8 +1,21 @@
 #orderArea{
-	height: 100%;
-	background-color:yellow;
+	border-style: solid;
+	border-color: #000000;
+	border-width: 4px;
+	border-radius: 15px;
+	overflow-y: scroll;
+	position : relative; bottom:0;
 	text-align: justify;}
-	
+
+ul{
+	padding-left:0px;
+	background-color:#D3D3D3;
+}
+
+li{
+  margin-left:30px;
+}
+
 #orderTotal{
 float: right;
 text-align: right;
@@ -28,7 +41,10 @@ padding-right: 0px;
 	text-align: center;
 	line-height: 50px;}
 
-.subbutton[name="mods"]{width: 100%;}
+.subbutton[name="mods"]{
+	width: 100%;
+}
+
 .orderArea{
 	position: relative;
 }
@@ -68,12 +84,12 @@ padding-right: 0px;
 	background: -webkit-radial-gradient(blue, blue);
 	background: radial-gradient(blue, blue);
 	}
+	
 .ActiveItem{
 	background: -webkit-radial-gradient(yellow, orange);
 	background: radial-gradient(yellow, orange);
 	}	
 
-	
 .item:hover{
 	background-color:yellow;
 	text-align: center;}
