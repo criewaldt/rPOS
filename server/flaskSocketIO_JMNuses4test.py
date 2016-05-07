@@ -27,6 +27,7 @@ buttons = {'buttonBuilder':
                             'pickles':{'price':'10.50'}
                             }
                        },
+                        
                        
                   'pasta':
                        {'parmagan':
@@ -40,7 +41,11 @@ buttons = {'buttonBuilder':
                             }
                         }
                        },
-                  
+            'noSubCats':
+                           {'salad':{'price':'3.50'},
+                            'cupcake':{'price':'2.50'},
+                            'coffee':{'price':'1.50'}
+                            }, 
            'drinks':
                     {'soda':
                       {'coke':

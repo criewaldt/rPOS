@@ -27,7 +27,7 @@ padding-right: 0px;
 	text-align: center;
 	line-height: 50px;}
 
-
+.button[name="mods"]{width: 100%;}
 .orderArea{
 	position: relative;
 }
@@ -78,6 +78,7 @@ padding-right: 0px;
 	text-align: center;}
 	
 #sendOrder{
+	float: right;
 	position: relative;
 	background-color: orange;
 }
