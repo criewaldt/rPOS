@@ -41,7 +41,7 @@ buttons = {'buttonBuilder':
                             }
                         }
                        },
-            'random':
+            'noSubCats':
                            {'salad':{'price':'3.50'},
                             'cupcake':{'price':'2.50'},
                             'coffee':{'price':'1.50'}

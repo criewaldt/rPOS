@@ -27,7 +27,7 @@ padding-right: 0px;
 	text-align: center;
 	line-height: 50px;}
 
-.button[name="mods"]{width: 100%;}
+.subbutton[name="mods"]{width: 100%;}
 .orderArea{
 	position: relative;
 }
@@ -52,10 +52,10 @@ padding-right: 0px;
 	border-color: #000000;
 	background-color:white;
 	border-radius: 15px;
-	
+	white-space: nowrap;	
 	overflow:hidden;
 	display: none;
-	width: 25%;
+	width: 30%;
 	clear: right;
 	text-align: center;
 	vertical-align: middle;

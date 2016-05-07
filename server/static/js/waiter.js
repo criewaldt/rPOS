@@ -26,7 +26,7 @@ ButtonBuilder():
 */
 
 function ButtonBuilder(obj,parentKey,id) {
-	console.log(PageIsReady);
+	
 	if (!PageIsReady) {PageIsReady = 2;}
 	else {PageIsReady += 1;};
 
@@ -119,7 +119,7 @@ function addItemToOrder(Name,count,price){
 };
 /*
 display_CategoryView(parentDiv):
-	IN: parentDiv - the element was clicked $(this)
+	IN: parentDiv - the element that was clicked $(this)
 	PURPOSE: If there is content in 'categoryView' div, remove
 		it and return to it's correct parent.  Then take the nested content
 		 of the 'terminal' element clicked.
@@ -129,28 +129,19 @@ display_CategoryView(parentDiv):
 */
 function display_CategoryView(parentDiv) {
 	var previousSelection = $('.ActiveCategory');
-	console.log(previousSelection.length);
+	var view = $('#categoryView');
+
+	if (previousSelection.length>0) {
+		view.find('*').css('display','none');
+		view.children().not('#itemView').appendTo($('#'+previousSelection[0].id));
+	};
 	
-	if (previousSelection.length >0) {
-		var id = previousSelection[0].id;
-		console.log(bbJSON["buttonBuilder"][id]);
-		PageIsReady = false;
-		ButtonBuilder(bbJSON["buttonBuilder"],id,id);
-		};
-
-	var newParent = $('#categoryView');
-	newParent.find('*').not('#itemView').remove();
-
-
 	//clone(true) takes all attached handlers too, see docs
-	parentDiv.children().clone(true).prependTo(newParent);
+	parentDiv.children().clone(true).prependTo(view);
 	parentDiv.children().remove();
-	/*
-if(newParent.children('.subbutton').css('display') ==='none'){
-			newParent.children('.subbutton').toggle();};	
-	*/
-   if(newParent.children().css('display') ==='none'){
-			newParent.children().toggle();};
+
+   if(view.children().css('display') ==='none'){
+			view.children().toggle();};
 			
 	previousSelection.removeClass("ActiveCategory");//remove 'active' class on previous parent	
 	parentDiv.addClass("ActiveCategory");
@@ -169,13 +160,22 @@ function display_ItemModifiers(mods) {
 };
 
 function display_ItemView(parentDiv) {
-	console.log(parentDiv);
-	$('.subbutton').removeClass("ActiveItem");
-	var newParent = $('#itemView');
-	newParent.empty();
-	parentDiv.children().not("[name='mods']").clone(true).prependTo(newParent);
-	parentDiv.children("[name='mods']").clone(true).appendTo(newParent);
-	newParent.children().css('display','block');
+	var previousSelection = $(".ActiveItem");
+	var view = $('#itemView');
+	console.log(view.children().length);
+	if (view.children().length>0) {
+		view.children().find('*').css('display','none');
+		view.children().appendTo(previousSelection);
+		view.empty();
+	}
+	view.empty();
+	previousSelection.removeClass("ActiveItem");
+	parentDiv.children().not("[name='mods']").prependTo(view);
+	parentDiv.children("[name='mods']").appendTo(view);
+
+	parentDiv.siblings().children().not('#itemView').css('display','none');
+	view.css('display','block');
+	view.children().toggle();
 
 	parentDiv.addClass("ActiveItem");
 };
@@ -221,6 +221,7 @@ $(document).ready(function(){
 	mySocket.send(JSON.stringify({'buttonBuilder':1}));
 	
 	document.getElementById('sendOrder').onclick = function (){
+		alert();
 		mySocket.send(JSON.stringify(orderData));
 	};
 
