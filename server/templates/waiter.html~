@@ -20,13 +20,21 @@
 	
 	<body>
 	 <h1>Waiter Page</h1>
+	 <div class="container">
 	 <div class="row">
-	<div class="col-xs-3" id="terminal"></div>
-	<div class="col-xs-6" id="categoryView">
-	<div class="col-xs-6" id="itemView"></div></div>
-	<div class="col-xs-3 orderArea" id="orderArea"></div>
-		 <div class="col-xs-12 orderArea" id="orderTotal">Total:  $0.00</div>
-	</div>	
-<button type="button" class="btn btn-primary" id="sendOrder">SEND ORDER</button>
+	<button type="button" class="btn btn-primary" id="remove">REMOVE</button>
+	 </div></div>
+	 <div class="container">
+		 <div class="row-fluid">
+			<div class="col-md-3" id="terminal"></div>
+			<div class="col-md-6" id="categoryView">
+			<div class="col-md-6" id="itemView"></div></div>
+			<div class="col-md-3 orderArea" id="orderArea">	</div>
+
+
+			<div class="col-md-12 orderArea" id="orderTotal">Total:  $0.00</div>
+			<button type="button" class="btn btn-primary" id="sendOrder">SEND ORDER</button>				
+			</div>
+	</div>
 </body>
 </html>

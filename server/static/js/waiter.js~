@@ -115,6 +115,7 @@ function addItemToOrder(Name,count,price,mod){
 	var itemName = Name+'-'+count
 	var newItem = document.createElement("ul");
 	newItem.setAttribute('id',itemName);
+	newItem.setAttribute('value',price);
 	document.getElementById('orderArea').appendChild(newItem);
 	$('#'+itemName).html(Name.toUpperCase() +'  $'+price);
 	$('#orderTotal').html('Total:  $'+orderTotal.toFixed(2));//force two decimal spots	
@@ -122,13 +123,18 @@ function addItemToOrder(Name,count,price,mod){
 };
 
 function modifyItemInOrder(Name,count,price) {
-	var itemToModify = $('#orderArea').children().last();
+	if ($("ul.editItem").length>0) {
+		var itemToModify = $(".editItem");
+	}else {
+		var itemToModify = $('#orderArea').children().last();};
+		
 	var itemName = Name+'-'+count
 	var newItem = document.createElement("li");
 	var price = parseFloat(price);
 	orderTotal += price;
 	
 	newItem.setAttribute('id',itemName);
+	newItem.setAttribute('value',price);
 	itemToModify.append(newItem);
 	$('#'+itemName).html(Name.toUpperCase() +'  $'+price);
 	$('#orderTotal').html('Total:  $'+orderTotal.toFixed(2));
@@ -195,11 +201,12 @@ function assign_ClickHandlers() {
 	
 		 /*---- ITEMS Class Click Event-----*/
 			$('.item').click (function (event) { 
+
 			var mods = false;
+
 			if($(this).parent().attr('name') === 'mods'){
 				mods = 'mods';
 				};
-
 				var nm = $(this).attr('name');
 				var price = $(this).attr('value');
 					if (!orderData["orderData"][nm]) {
@@ -226,6 +233,39 @@ function assign_ClickHandlers() {
 			$('.button').click (function () {
 					display_CategoryView($(this));
 				});
+				
+			/*---- orderArea Class Click Event-----*/	
+			$(".orderArea").click (function (event) {
+
+				var currentItem = $(".editItem");
+				var Clicked = $(event.target);
+				
+				if ( Clicked.parent().context.id === "orderArea"){return;}
+				else if(Clicked.context.id === currentItem.attr('id')){
+					$("#remove").css('visibility','hidden');
+					$(".editItem").removeClass("editItem");
+					return;}
+				else{
+					$("#remove").css('visibility','visible');
+					$(".editItem").removeClass("editItem");
+					event.target.setAttribute('class','editItem');};
+				
+				event.stopPropagation();
+				});
+				
+			/*---- remove Class Click Event-----*/		
+			$("#remove").click (function (event) {
+				var currentItem = $(".editItem");
+				orderTotal -= parseFloat(currentItem.attr("value"));
+				while(currentItem.children().length>0){
+					orderTotal -= parseFloat(currentItem.children().first().attr("value"));
+					currentItem.children().first().remove();
+				};
+				
+				$('#orderTotal').html('Total:  $'+orderTotal.toFixed(2));
+				currentItem.remove();
+				$(this).css('visibility','hidden');
+			});
 };
 
 $(document).ready(function(){
@@ -239,6 +279,7 @@ $(document).ready(function(){
 	document.getElementById('sendOrder').onclick = function (){
 		alert();
 		mySocket.send(JSON.stringify(orderData));
+		$('#orderArea').empty();
 	};
 
 	/* FUNCTION TO READ INBOUND DATA*/
