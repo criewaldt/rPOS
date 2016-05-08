@@ -22,15 +22,17 @@
 	 <h1>Waiter Page</h1>
 	 <div class="container">
 	 <div class="row">
-	<button type="button" class="btn btn-primary" id="remove">REMOVE</button>
+
 	 </div></div>
 	 <div class="container">
 		 <div class="row-fluid">
 			<div class="col-md-3" id="terminal"></div>
 			<div class="col-md-6" id="categoryView">
 			<div class="col-md-6" id="itemView"></div></div>
+				<p id="mod_remove_msg">Click to Mod/Remove</p>
+				<button type="button" class="btn btn-primary" id="remove">REMOVE</button>
+				<button type="button" class="btn btn-primary" id="modify">MODIFY</button>			
 			<div class="col-md-3 orderArea" id="orderArea">	</div>
-
 
 			<div class="col-md-12 orderArea" id="orderTotal">Total:  $0.00</div>
 			<button type="button" class="btn btn-primary" id="sendOrder">SEND ORDER</button>				

@@ -104,13 +104,22 @@ padding-right: 0px;
 	background-color: orange;
 }
 
-#sendOrder{
+#orderTotal{
 	font-size: 20px;
 }
 #remove{
 	visibility: hidden;
 	float: right;
 	background-color: red;
+	border-style: solid;
+	border-color: red;
+	border-width: 4px;
+}
+
+#modify{
+	visibility: hidden;
+	float: right;
+	background-color: blue;
 	border-style: solid;
 	border-color: red;
 	border-width: 4px;
