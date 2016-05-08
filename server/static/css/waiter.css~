@@ -8,13 +8,16 @@
 	text-align: justify;}
 
 ul{
-	margin-left:0px;
 	padding-left:0px;
 	background-color:#D3D3D3;
 }
 
 li{
   margin-left:30px;
+}
+
+.editItem{
+	background-color:yellow;
 }
 
 #orderTotal{
@@ -99,4 +102,16 @@ padding-right: 0px;
 	float: right;
 	position: relative;
 	background-color: orange;
+}
+
+#sendOrder{
+	font-size: 20px;
+}
+#remove{
+	visibility: hidden;
+	float: right;
+	background-color: red;
+	border-style: solid;
+	border-color: red;
+	border-width: 4px;
 }
