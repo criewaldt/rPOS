@@ -29,7 +29,6 @@
 			<div class="col-md-3" id="terminal"></div>
 			<div class="col-md-6" id="categoryView">
 			<div class="col-md-6" id="itemView"></div></div>
-				<p id="mod_remove_msg">Click to Mod/Remove</p>
 				<button type="button" class="btn btn-primary" id="remove">REMOVE</button>
 				<button type="button" class="btn btn-primary" id="modify">MODIFY</button>			
 			<div class="col-md-3 orderArea" id="orderArea">	</div>

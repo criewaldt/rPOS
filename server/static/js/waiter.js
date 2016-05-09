@@ -1,18 +1,11 @@
-/*
-	DYNAMICALLY CREATE CLICK EVENTS LISTENERS
-	https://toddmotto.com/attaching-event-handlers-to-dynamically-created-javascript-elements/
-
-	POPULATE BUTTONS FROM JSON RECEIVED FROM SERVER
-	-resources-
-	http://stackoverflow.com/questions/21747878/how-to-populate-a-dropdown-list-with-json-data-dynamically-section-wise-into-th
-   http://www.encodedna.com/2013/07/dynamically-add-remove-textbox-control-using-jquery.htm	
-	*/
 
 window.mySocket;//setup global var for the websocket
-var orderData = {'orderData' : {}};
-var orderTotal = 0.00;      
-var ElementId_Spacer = "-";   //space char in element name attr to denote location in buttonBuilder json
-var PageIsReady = false;//used to test when all html is built
+var SCREEN_WIDTH_MEDIA_QUERY;  //used to check what bootstrap col-* class is being used to switch to responsive
+var ORDER_DATA = {'ORDER_DATA' : {}};
+var ORDER_TOTAL = 0.00;      
+var ELMNT_ID_SPACE_CHAR = "-";   //space char in element name attr to denote location in buttonBuilder json
+var PAGE_IS_READY = false;//used to test when all html is built
+var WAIT_FOR_USER = false;//used to prevent new input if waiting for a selection from user
 
 /*-------These Function are used to build buttons on the screen--------
 ButtonBuilder():
@@ -21,13 +14,13 @@ ButtonBuilder():
 		id - location of element in json, id = [key][key]etc..., used as html id for element created
 	PURPOSE: iterate a json object, recursively iterate sub branches
 			and pass data to HTMLgenerator() to create html elements from the json
-		  PageIsReady >True when finished, click handlers are then assigned to generated content.
+		  PAGE_IS_READY >True when finished, click handlers are then assigned to generated content.
 */
 
 function ButtonBuilder(obj,parentKey,id) {
 	
-	if (!PageIsReady) {PageIsReady = 2;}
-	else {PageIsReady += 1;};	
+	if (!PAGE_IS_READY) {PAGE_IS_READY = 2;}
+	else {PAGE_IS_READY += 1;};	
 	var parentKey = parentKey;
 	var id = id || "";
 	var childKey = Object.keys(obj[parentKey]);
@@ -36,9 +29,9 @@ function ButtonBuilder(obj,parentKey,id) {
 	//since properties of an object: price, modification, etc are NOT Object.
 	if (obj instanceof Object) {
 		for (var i=0;i<childKey.length;i++) {
-			var jsonID = id+ElementId_Spacer+[childKey[i]];
+			var jsonID = id+ELMNT_ID_SPACE_CHAR+[childKey[i]];
 			//if id has 'spacer' GLOBAL VAR as first character, skip over it so ID starts with a letter
-			if (jsonID.charAt(0)==ElementId_Spacer) {jsonID = jsonID.substring(1);};
+			if (jsonID.charAt(0)==ELMNT_ID_SPACE_CHAR) {jsonID = jsonID.substring(1);};
 			//Actual Items pass extra argument price to HTMLgenerator
 			if (obj[parentKey][childKey[i]].price){
 				HTMLgenerator(jsonID,id,obj[parentKey][childKey[i]].price);
@@ -52,16 +45,16 @@ function ButtonBuilder(obj,parentKey,id) {
 			ButtonBuilder(obj[parentKey],[childKey[i]],jsonID);};
 		};
 	}else{return;};
-	PageIsReady -= 1;
-	//All finished, PageIsReady GLOBAL Var is True
-	if(PageIsReady===1){PageIsReady===true;assign_ClickHandlers();}
+	PAGE_IS_READY -= 1;
+	//All finished, PAGE_IS_READY GLOBAL Var is True
+	if(PAGE_IS_READY===1){PAGE_IS_READY===true;assign_ClickHandlers();}
 	
 };
 /*
 HTMLgenerator():
 	IN: id - name of an item in the format of location of in json, 
-				Example: id = root(ElementId_Spacer)parent(ElementId_Spacer)child(ElementId_Spacer)item
-				(ElementId_Spacer) is a GLOBAL VAR
+				Example: id = root(ELMNT_ID_SPACE_CHAR)parent(ELMNT_ID_SPACE_CHAR)child(ELMNT_ID_SPACE_CHAR)item
+				(ELMNT_ID_SPACE_CHAR) is a GLOBAL VAR
 		parentDiv - the div ID where the new div being created should be nested
 		price - if price, means input is an actual item, pass through HTMLgenerator() and go to createItem()
 	PURPOSE: create HTML div elements.  element id's correspond to json. the div nesting structore mirrors that
@@ -78,7 +71,7 @@ function HTMLgenerator(id,parentDiv,price) {
 	if (price) {createItem(id,parentDiv,price)}//items go to different builder function
 	else {
 		//isolate just the name of the item
-		var nm = id.substring(id.lastIndexOf(ElementId_Spacer)+1);//create var for elements name attribute
+		var nm = id.substring(id.lastIndexOf(ELMNT_ID_SPACE_CHAR)+1);//create var for elements name attribute
 		var newDiv = document.createElement("div");
 		document.getElementById(parentDiv).appendChild(newDiv);
 		newDiv.setAttribute('id',id);
@@ -92,8 +85,8 @@ function HTMLgenerator(id,parentDiv,price) {
 /*
 createItem(id,parentDiv,price):
 	IN: id - name of an item in the format of location of in json, 
-				Example: id = root(ElementId_Spacer)parent(ElementId_Spacer)child(ElementId_Spacer)item
-				(ElementId_Spacer) is a GLOBAL VAR
+				Example: id = root(ELMNT_ID_SPACE_CHAR)parent(ELMNT_ID_SPACE_CHAR)child(ELMNT_ID_SPACE_CHAR)item
+				(ELMNT_ID_SPACE_CHAR) is a GLOBAL VAR
 		parentDiv - the div ID where the new element being created should be nested
 		price - price of the item
 	PURPOSE: create HTML element for a menu item nested under parent category 
@@ -103,7 +96,7 @@ function createItem(id,parentDiv,price){
 	var id =id;
 	var parentDiv = parentDiv;
 	var price = price;
-	var nm = id.substring(id.lastIndexOf(ElementId_Spacer)+1);//create var for elements name attribute
+	var nm = id.substring(id.lastIndexOf(ELMNT_ID_SPACE_CHAR)+1);//create var for elements name attribute
 	var newItem = document.createElement("p");
 	newItem.setAttribute('class','item stockYES');
 	newItem.setAttribute('id',id);
@@ -123,9 +116,9 @@ addItemToOrder(Name,count,price,mod):
 */
 function addItemToOrder(id,count,price,mod){
 	var modify = mod || false;
-	var Name = id.substring(id.lastIndexOf(ElementId_Spacer)+1);//create var for elements name attribute
+	var Name = id.substring(id.lastIndexOf(ELMNT_ID_SPACE_CHAR)+1);//create var for elements name attribute
 	if (!modify) {
-		orderTotal += parseFloat(price);
+	//	ORDER_TOTAL += parseFloat(price);
 		var itemName = Name+'-'+count;
 		var newItem = document.createElement("ul");
 		newItem.setAttribute('id',itemName);
@@ -133,7 +126,8 @@ function addItemToOrder(id,count,price,mod){
 		newItem.setAttribute('name',id);
 		document.getElementById('orderArea').appendChild(newItem);
 		$('#'+itemName).html(Name.toUpperCase() +'  $'+price);
-		$('#orderTotal').html('Total:  $'+orderTotal.toFixed(2));//force two decimal spots	
+		updateOrderTotal();
+		//$('#ORDER_TOTAL').html('Total:  $'+ORDER_TOTAL.toFixed(2));//force two decimal spots	
 	}else {modifyItemInOrder(Name,count,price,id);};
 };
 
@@ -143,8 +137,8 @@ modifyItemInOrder(Name,count,price,id):
 		count - used to create unique element ID when there is a duplicate.
 		price - price of the item
 		id - element ID of menu item. the id is also equal to the items location in JSON
-				Example: id = root(ElementId_Spacer)parent(ElementId_Spacer)child(ElementId_Spacer)item
-				(ElementId_Spacer) is a GLOBAL VAR
+				Example: id = root(ELMNT_ID_SPACE_CHAR)parent(ELMNT_ID_SPACE_CHAR)child(ELMNT_ID_SPACE_CHAR)item
+				(ELMNT_ID_SPACE_CHAR) is a GLOBAL VAR
 	PURPOSE: add the clicked menu item modifier to the orderArea div. 
 	OUT: nothing
 */
@@ -158,14 +152,15 @@ function modifyItemInOrder(Name,count,price,id) {
 		
 	var itemName = Name+'-'+count;//creates unique
 	var newItem = document.createElement("li");
-	var price = parseFloat(price);
-	orderTotal += price;
+	//var price = parseFloat(price);
+	//ORDER_TOTAL += price;
 	newItem.setAttribute('name',id);
 	newItem.setAttribute('id',itemName);
 	newItem.setAttribute('value',price);
 	itemToModify.append(newItem);
 	$('#'+itemName).html(Name.toUpperCase() +'  $'+price);
-	$('#orderTotal').html('Total:  $'+orderTotal.toFixed(2));
+	updateOrderTotal()
+	//$('#ORDER_TOTAL').html('Total:  $'+ORDER_TOTAL.toFixed(2));
 }	
 	
 /*
@@ -210,6 +205,7 @@ display_ItemView(parentDiv):
 	OUT: nothing
 */
 function display_ItemView(parentDiv) {
+
 	var previousSelection = $(".ActiveItem");
 	var view = $('#itemView');
 
@@ -248,20 +244,61 @@ function display_ItemModifiers(mods) {
 /*
 ItemDepthInTree(itemNameString):
 	IN: itemNameString - a string that represents the location of the clicked element in DOM and JSON
-		Example: id = root(ElementId_Spacer)parent(ElementId_Spacer)child(ElementId_Spacer)item
-				(ElementId_Spacer) is a GLOBAL VAR
+		Example: id = root(ELMNT_ID_SPACE_CHAR)parent(ELMNT_ID_SPACE_CHAR)child(ELMNT_ID_SPACE_CHAR)item
+				(ELMNT_ID_SPACE_CHAR) is a GLOBAL VAR
 	PURPOSE: Determine where the clicked element and it's associated category
-	OUT: an array of all occurrence of 'ElementId_Spacer'.  if empty, didn't occur.  
+	OUT: an array of all occurrence of 'ELMNT_ID_SPACE_CHAR'.  if empty, didn't occur.  
 			each occurrence represents a down the DOM nested structure and JSON
 */
 function ItemDepthInTree(itemNameString) {
     var indexes = [], i;
     for(i = 0; i < itemNameString.length; i++)
-        if (itemNameString[i] === ElementId_Spacer)
+        if (itemNameString[i] === ELMNT_ID_SPACE_CHAR)
             indexes.push(i);
     return indexes;
-}
+};
 
+/*
+updateOrderTotal():
+	IN: nothing
+	PURPOSE:  get the 'value' attribute of all items in the 'orderArea'  add them up
+				and assign result to the global ORDER_TOTAL.
+*/
+function updateOrderTotal() {
+var all_items_ordered= 	document.getElementById('orderArea').getElementsByTagName("*");
+var i;
+ORDER_TOTAL = 0;
+for (i=0;i < all_items_ordered.length; i++) {
+	ORDER_TOTAL += parseFloat(all_items_ordered[i].getAttribute('value'));
+	};
+$('#orderTotal').html('Total:  $'+ORDER_TOTAL.toFixed(2));//force 2 decimals
+};
+
+function checkBootstrap_col_class() {
+	//BOOTSTRAP width
+/*
+.col-xs-*: none (auto)
+.col-sm-*: 750px
+.col-md-*: 970px
+.col-lg-*: 1170px */
+	var terminal_col_class = document.getElementById('terminal').getAttribute('class');
+	terminal_col_class = terminal_col_class.substring(terminal_col_class.indexOf("-")+1,terminal_col_class.indexOf("-")+3);
+	
+	switch(terminal_col_class) {
+		case 'xs':
+					SCREEN_WIDTH_MEDIA_QUERY = 0;
+					break;
+		case 'sm':
+					SCREEN_WIDTH_MEDIA_QUERY = 750;
+					break;
+		case 'md':
+					SCREEN_WIDTH_MEDIA_QUERY = 970;
+					break;
+		case 'lg':
+					SCREEN_WIDTH_MEDIA_QUERY = 1170;
+					break;
+	};
+};
 /*
 assign_ClickHandlers():
 
@@ -271,8 +308,8 @@ this function is called when all the HTML elements have been built.  Otherwise c
 elements don't exist yet.
 
 GLOBALS USED:
-	orderData
-	orderTotal
+	ORDER_DATA
+	ORDER_TOTAL
 
 FUNCTIONS USED:
 	addItemToOrder()
@@ -292,9 +329,11 @@ function assign_ClickHandlers() {
 			
 	/*---- ITEMS Class Click Event-----*/
 		$('.item').click (function (event) { 
+			//condition of items with special item specific modifiers
 			if ($(this).children().length>0) {
 					$(this).children().toggle();
 					$(this).children().css('width','100%')};
+					
 				var count;
 				var nm = $(this).attr('id');
 				var price = $(this).attr('value');
@@ -303,11 +342,13 @@ function assign_ClickHandlers() {
 				if($(this).parent().attr('name') === 'mods' || $(this).parent().is("p")){
 					mods = 'mods';}
 				else {mods = false;};
-					
-				if (!orderData["orderData"][nm]) {
-							orderData["orderData"][nm] = 1;}
-				else {orderData["orderData"][nm] += 1;}
-				count = orderData["orderData"][nm];
+				
+				//check if item was already ordered, if so add to count so the items ID will be unique	when placed in the orderArea view
+				if (!ORDER_DATA["ORDER_DATA"][nm]) {
+							ORDER_DATA["ORDER_DATA"][nm] = 1;}
+				else {ORDER_DATA["ORDER_DATA"][nm] += 1;}
+				count = ORDER_DATA["ORDER_DATA"][nm];
+				
 				addItemToOrder(nm,count,price,mods);
 				event.stopPropagation();
 				});
@@ -358,15 +399,14 @@ function assign_ClickHandlers() {
 	/*---- remove button Click Event-----*/		
 			$("#remove").click (function (event) {
 				var currentItem = $(".editItem");
-				orderTotal -= parseFloat(currentItem.attr("value"));
+				//if currentItem has child modifiers remove them
 				while(currentItem.children().length>0){
-					orderTotal -= parseFloat(currentItem.children().first().attr("value"));
 					currentItem.children().first().remove();
 				};
-				$('#orderTotal').html('Total:  $'+orderTotal.toFixed(2));
 				currentItem.remove();
 				$(this).css('visibility','hidden');
 				$("#modify").css('visibility','hidden');
+				updateOrderTotal();
 			});
 			
 	/*---- modify button Click Event-----*/		
@@ -379,13 +419,16 @@ function assign_ClickHandlers() {
 				$('#'+ parentCategory).trigger("click");
 				var subCategory = loc.substring(0,depth[1]);
 				$('#'+subCategory).trigger("click");
-				var mods = subCategory + ElementId_Spacer + 'mods';
+				var mods = subCategory + ELMNT_ID_SPACE_CHAR + 'mods';
 				$('#'+mods).trigger("click");
 				
 			});
 };
 
 $(document).ready(function(){
+	//determine what size screen bootstrap will switch to responsive layout
+	checkBootstrap_col_class();
+
 	mySocket = io.connect();//create new websocket, 
 	
 	/* ON LOAD sending a json with key term 'buttonBuilder'
@@ -395,7 +438,7 @@ $(document).ready(function(){
 	
 	document.getElementById('sendOrder').onclick = function (){
 		alert();
-		mySocket.send(JSON.stringify(orderData));
+		mySocket.send(JSON.stringify(ORDER_DATA));
 		$('#orderArea').empty();
 	};
 
