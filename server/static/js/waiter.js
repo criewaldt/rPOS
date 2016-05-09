@@ -27,8 +27,7 @@ ButtonBuilder():
 function ButtonBuilder(obj,parentKey,id) {
 	
 	if (!PageIsReady) {PageIsReady = 2;}
-	else {PageIsReady += 1;};
-
+	else {PageIsReady += 1;};	
 	var parentKey = parentKey;
 	var id = id || "";
 	var childKey = Object.keys(obj[parentKey]);
@@ -42,7 +41,11 @@ function ButtonBuilder(obj,parentKey,id) {
 			if (jsonID.charAt(0)==ElementId_Spacer) {jsonID = jsonID.substring(1);};
 			//Actual Items pass extra argument price to HTMLgenerator
 			if (obj[parentKey][childKey[i]].price){
-				HTMLgenerator(jsonID,id,obj[parentKey][childKey[i]].price)}
+				HTMLgenerator(jsonID,id,obj[parentKey][childKey[i]].price);
+				//check if the item has item specific mods, ie' large/small, mild/medium/hot/
+				if (obj[parentKey][childKey[i]].mods) {
+				ButtonBuilder(obj[parentKey][childKey[i]],["mods"],jsonID);};
+				}
 			//recursion, continue to work through a branch of JSON			
 			else {
 			HTMLgenerator(jsonID,id);
@@ -184,7 +187,10 @@ function display_CategoryView(parentDiv) {
 		view.children().not('#itemView').appendTo($('#'+previousSelection[0].id));//dont remove the #itemView element when returning data to parent
 	};
 	
-	parentDiv.children().prependTo(view);
+	//parentDiv.children().prependTo(view);
+		//make 'mods' below all of the items
+	parentDiv.children().not("[name='mods']").prependTo(view);
+	parentDiv.children("[name='mods']").appendTo(view);
 
    if(view.children().css('display') ==='none'){
 			view.children().toggle();};
@@ -235,7 +241,7 @@ display_ItemModifiers(mods):
 	OUT: nothing
 */
 function display_ItemModifiers(mods) {
-	mods.children().css('width','50%');
+	mods.children().css('width','100%');
 	mods.children().toggle();	
 };
 
@@ -278,19 +284,31 @@ FUNCTIONS USED:
 
 function assign_ClickHandlers() {
 	
+	/*---- ITEMS with SPECIAL modifiers Click Event-----*/
+		$('p.item > p.item').click (function (event) { 
+				$(this).css('display','none');
+				$(this).siblings().css('display','none');
+				});
+			
 	/*---- ITEMS Class Click Event-----*/
-			$('.item').click (function (event) { 
-				var mods;//boolean if 'item' is a modifier or item
-				if($(this).parent().attr('name') === 'mods'){
-					mods = 'mods';
-					}else {mods = false;};
+		$('.item').click (function (event) { 
+			if ($(this).children().length>0) {
+					$(this).children().toggle();
+					$(this).children().css('width','100%')};
+				var count;
 				var nm = $(this).attr('id');
 				var price = $(this).attr('value');
-					if (!orderData["orderData"][nm]) {
-							orderData["orderData"][nm] = 1;}
-					else {orderData["orderData"][nm] += 1;}
+				var mods;//boolean if 'item' is a modifier or item
+				
+				if($(this).parent().attr('name') === 'mods' || $(this).parent().is("p")){
+					mods = 'mods';}
+				else {mods = false;};
 					
-				addItemToOrder(nm,orderData["orderData"][nm],price,mods);
+				if (!orderData["orderData"][nm]) {
+							orderData["orderData"][nm] = 1;}
+				else {orderData["orderData"][nm] += 1;}
+				count = orderData["orderData"][nm];
+				addItemToOrder(nm,count,price,mods);
 				event.stopPropagation();
 				});
 			
@@ -345,7 +363,6 @@ function assign_ClickHandlers() {
 					orderTotal -= parseFloat(currentItem.children().first().attr("value"));
 					currentItem.children().first().remove();
 				};
-				
 				$('#orderTotal').html('Total:  $'+orderTotal.toFixed(2));
 				currentItem.remove();
 				$(this).css('visibility','hidden');
@@ -353,7 +370,7 @@ function assign_ClickHandlers() {
 			});
 			
 	/*---- modify button Click Event-----*/		
-	// FIX! this is basically hard coded
+	// FIX! this is hard coded for a item that is in a tree parent>child>item
 			$("#modify").click (function (event) {
 				var currentItem = $(".editItem");
 				var loc = currentItem.attr("name");
@@ -390,6 +407,7 @@ $(document).ready(function(){
 			This is used to route the JSON to appropriate place through series of IF's*/
 			
 			if (Object.keys(JSONdata)[0] === 'buttonBuilder'){
+				console.log(JSONdata);
 				ButtonBuilder(JSONdata,'buttonBuilder');
 			};
 			

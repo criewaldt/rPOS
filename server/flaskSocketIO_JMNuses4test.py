@@ -12,9 +12,99 @@ socketio = SocketIO(app)
 
 #when live this JSON should be built by reading an excel sheet
 '''
-NOTE! error right now if keys contain whitespace "my food" >change to> "my_food"
+NOTE! error right now if keys contain white-space "my food" >change to> "my_food"
 '''
 buttons = {'buttonBuilder': 
+                {'Appetizers':
+                    {'Chicken':{'buffalo_wings':{'price':'10.50',
+                           				 			 'mods':{'mild':{'price':'0.00'},
+                           							 			'hot':{'price':'0.00'}}},
+                       				'bbq_wings':{'price':'9.50'},                        	
+                       				'honey_wings':{'price':'9.75'},
+                      				'mozzarella sticks':{'price':'7.75'},
+                   				   'mods':{'ExtraSauce':{'price':'0.50'},
+                             					'marinara':{'price':'0.50'},
+                             				   'blueCheese':{'price':'0.50'}}
+                       },                      
+                  'Salads':{'house':{'price':'3.50',
+                            			'mods':{'Italian':{'price':'0.00'},
+                           					'ranch':{'price':'0.00'},
+                           					'vinaigrette':{'price':'0.00'}}},
+                        	'cessar':{'price':'9.50',
+                            			 'mods':{'Italian':{'price':'0.00'},
+                           						'ranch':{'price':'0.00'},
+                           						'vinaigrette':{'price':'0.00'}}},
+                           'mods':{'ExtraDressing':{'price':'1.50'},
+                            		  'baconBits':{'price':'10.50'},
+                            		  'fetaCheese':{'price':'10.50'}}
+                        },                     
+                   'Fries':{'curly_fries': {'price':'5.50',
+                            				'mods':{'regular':{'price':'0.00'},
+                           							'large':{'price':'1.00'}}},
+                        	'waffle_fries':{'price':'4.50',
+                            				'mods':{'regular':{'price':'0.00'},
+                           							'large':{'price':'1.00'}}},
+                        	'steak_fries':{'price':'5.75',
+                            				'mods':{'regular':{'price':'0.00'},
+                           							'large':{'price':'1.00'}}},
+                       	 'cheese_fries':{'price':'5.00',
+                            				'mods':{'regular':{'price':'0.00'},
+                           							'large':{'price':'1.00'}}},
+                       	 'mods': {'gravy':{'price':'1.50'},
+                            		'cheese':{'price':'1.50'},
+                            		'bacon':{'price':'2.50'}}}
+                  },
+
+            'Favorites':{'burger':{'price':'3.50'},
+                          'beer':{'price':'2.50'},
+                          'coffee':{'price':'1.50'}}, 
+                            
+           'Fountain_Drinks': {'coke':{'price':'1.50',
+                           				'mods':{'medium':{'price':'0.00'},
+                           							'large':{'price':'0.75'},
+                           							'xlarge':{'price':'1.25'}}},
+                      			 'rootbeer':{'price':'1.50',
+                           					 'mods':{'medium':{'price':'0.00'},
+                           								'large':{'price':'0.75'},
+                           								'xlarge':{'price':'1.25'}}},
+                       			 'sprite':{'price':'1.50',
+                           					'mods':{'medium':{'price':'0.00'},
+                           							'large':{'price':'0.75'},
+                           							'xlarge':{'price':'1.25'}}},
+                       			 'water':{'price':'0.00'},
+                      			 'mods':{'lemon':{'price':'0.00'},
+                               			'FunStraw':{'price':'0.50'},
+                              			 'NO_ice':{'price':'0.00'}}
+                       },
+                       
+            'Alcohol':{'beer':{'bud':{'price':'5.00',
+                           				'mods':{'12ozDraft':{'price':'0.00'},
+                           					  	  '16ozDraft':{'price':'0.75'},
+                           						  '16ozBottle':{'price':'0.25'}}},
+                       	   	'corona':{'price':'5.50',
+                           				'mods':{'12ozDraft':{'price':'0.00'},
+                           							'16ozDraft':{'price':'0.75'},
+                           							'16ozBottle':{'price':'0.25'}}},
+                             'PBR':{'price':'4.50',
+                           		   'mods':{'12ozDraft':{'price':'0.00'},
+                           					'16ozDraft':{'price':'0.75'},
+                           					'16ozBottle':{'price':'0.25'}}}},
+                    'wine':{'red':{'price':'6.00',
+                           		  'mods':{'8ozGlass':{'price':'0.00'},
+                           					 '750Bottle':{'price':'0.25'}}},
+                       		'white':{'price':'6.00',
+                           			'mods':{'8ozGlass':{'price':'0.00'},
+                           						'750Bottle':{'price':'0.25'}}},
+                        	'mods':{'ice':{'price':'0.00'},
+                            			'straw':{'price':'0.00'},
+                           		 'lemon':{'price':'0.00'}}}
+                  		}
+             	}
+        }
+                  		
+          
+           
+xyz = {'buttonBuilder': 
                 {'entre':
                     {'burgers':
                       {'bbq_burger':
@@ -73,8 +163,7 @@ buttons = {'buttonBuilder':
                        
                   }
             }           
-        }          
-           
+        }      
 
 @app.route('/')
 def index():

@@ -3,8 +3,8 @@
 	border-color: #000000;
 	border-width: 4px;
 	border-radius: 15px;
-	overflow-y: scroll;
-	position : relative; bottom:0;
+	overflow-y: auto;
+	position : relative; bottom:-1000;
 	text-align: justify;}
 
 ul{
@@ -47,6 +47,8 @@ padding-right: 0px;
 
 .subbutton[name="mods"]{
 	width: 100%;
+	float: none;
+	clear: left;
 }
 
 .orderArea{
@@ -77,21 +79,23 @@ padding-right: 0px;
 	overflow:hidden;
 	display: none;
 	width: 30%;
-	clear: right;
+	float: inherit;
 	text-align: center;
 	vertical-align: middle;
 	text-align: center;
 	line-height: 50px;}
 	
-		
+p.item > p{	
+	background-color: yellow;
+}
 .ActiveCategory{
 	background: -webkit-radial-gradient(blue, blue);
 	background: radial-gradient(blue, blue);
 	}
 	
 .ActiveItem{
-	background: -webkit-radial-gradient(yellow, orange);
-	background: radial-gradient(yellow, orange);
+	background: -webkit-radial-gradient(white, orange);
+	background: radial-gradient(white, orange);
 	}	
 
 .item:hover{
