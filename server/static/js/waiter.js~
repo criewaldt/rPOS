@@ -1,9 +1,4 @@
-//BOOTSTRAP width
-/*
-.col-xs-*: none (auto)
-.col-sm-*: 750px
-.col-md-*: 970px
-.col-lg-*: 1170px */
+
 window.mySocket;//setup global var for the websocket
 var SCREEN_WIDTH_MEDIA_QUERY;  //used to check what bootstrap col-* class is being used to switch to responsive
 var ORDER_DATA = {'ORDER_DATA' : {}};
@@ -20,6 +15,8 @@ ButtonBuilder():
 	PURPOSE: iterate a json object, recursively iterate sub branches
 			and pass data to HTMLgenerator() to create html elements from the json
 		  PAGE_IS_READY >True when finished, click handlers are then assigned to generated content.
+	OTHER FUNCTIONS USED:
+			HTMLgenerator()
 */
 
 function ButtonBuilder(obj,parentKey,id) {
@@ -46,6 +43,7 @@ function ButtonBuilder(obj,parentKey,id) {
 				}
 			//recursion, continue to work through a branch of JSON			
 			else {
+				if (obj[parentKey][childKey[i]].ObjectProperties){jsonID = jsonID+obj[parentKey][childKey[i]].ObjectProperties.innerHTML};
 			HTMLgenerator(jsonID,id);
 			ButtonBuilder(obj[parentKey],[childKey[i]],jsonID);};
 		};
@@ -64,6 +62,9 @@ HTMLgenerator():
 		price - if price, means input is an actual item, pass through HTMLgenerator() and go to createItem()
 	PURPOSE: create HTML div elements.  element id's correspond to json. the div nesting structore mirrors that
 				of the JSON used to build.  so json branches are under parent branch div's. actual items pass through this function
+	OTHER FUNCTIONS USED:
+			createItem()
+			HTMLelement()
 	OUT: nothing			
 */
 function HTMLgenerator(id,parentDiv,price) {
@@ -76,16 +77,46 @@ function HTMLgenerator(id,parentDiv,price) {
 	if (price) {createItem(id,parentDiv,price)}//items go to different builder function
 	else {
 		//isolate just the name of the item
-		var nm = id.substring(id.lastIndexOf(ELMNT_ID_SPACE_CHAR)+1);//create var for elements name attribute
-		var newDiv = document.createElement("div");
+		var nm = id.substring(id.lastIndexOf(ELMNT_ID_SPACE_CHAR)+1);//string split ID for elements name attribute
+		var newDiv = HTMLelement("div",['id:'+id,'name:'+nm]);
 		document.getElementById(parentDiv).appendChild(newDiv);
-		newDiv.setAttribute('id',id);
-		newDiv.setAttribute('name',nm);
+		
 		document.getElementById(id).innerHTML = nm.toUpperCase();
 			if (parentDiv==='terminal') {newDiv.setAttribute('class','button'); }
 			else {newDiv.setAttribute('class','subbutton'); }
 		}
 };
+
+function HTMLelement(Type,Attr,edit) {
+	var edit = edit || false;//bool if element is new or exists
+	var elementType = Type.toLowerCase();
+	var Element;
+
+	if (edit) {Element = document.getElementById(Type);}
+	else {Element = document.createElement(elementType);}
+	
+	if (Attr instanceof Array) {
+		var i;
+		for (i=0;i<Attr.length;i++) {
+			var attrName = Attr[i].substring(0,Attr[i].indexOf(":"));
+			var attrValue = Attr[i].substring(Attr[i].indexOf(":")+1);
+			if (attrName === 'id') {
+				var checkForElement = $('#'+attrValue);
+				if (checkForElement.length>0) {			
+					/*   UNCOMMENT BELOW  FOR ALT FUNCTIONALITY   */
+					//var Attr_id = Attr.splice(i,1);//remove ID
+					//HTMLelement(attrValue,Attr,true);
+					return;//FOR NOW DO NOTHING IF ID EXISTS
+					}
+
+				
+				}
+			Element.setAttribute(attrName, attrValue);
+			}
+	}
+	return Element;
+};
+
 
 /*
 createItem(id,parentDiv,price):
@@ -95,6 +126,8 @@ createItem(id,parentDiv,price):
 		parentDiv - the div ID where the new element being created should be nested
 		price - price of the item
 	PURPOSE: create HTML element for a menu item nested under parent category 
+	OTHER FUNCTIONS USED:
+			none
 	OUT: nothing
 */
 function createItem(id,parentDiv,price){
@@ -102,11 +135,7 @@ function createItem(id,parentDiv,price){
 	var parentDiv = parentDiv;
 	var price = price;
 	var nm = id.substring(id.lastIndexOf(ELMNT_ID_SPACE_CHAR)+1);//create var for elements name attribute
-	var newItem = document.createElement("p");
-	newItem.setAttribute('class','item stockYES');
-	newItem.setAttribute('id',id);
-	newItem.setAttribute('value',price);
-	newItem.setAttribute('name',nm);
+	var newItem = HTMLelement("p",['class:item stockYES','id:'+id,'value:'+price,'name:'+nm]);
 	document.getElementById(parentDiv).appendChild(newItem);
 	document.getElementById(id).innerHTML = nm.toUpperCase();
 };
@@ -117,6 +146,10 @@ addItemToOrder(Name,count,price,mod):
 		price - price of the item
 		mod - if the menu item is a modifier, example 'extra cheese', pass through and go to modifyItemInOrder()
 	PURPOSE: add the clicked menu item to the orderArea div. 
+	OTHER FUNCTIONS USED:
+			updateOrderTotal()
+			modifyItemInOrder()
+			HTMLelement()
 	OUT: nothing
 */
 function addItemToOrder(id,count,price,mod){
@@ -125,14 +158,11 @@ function addItemToOrder(id,count,price,mod){
 	if (!modify) {
 	//	ORDER_TOTAL += parseFloat(price);
 		var itemName = Name+'-'+count;
-		var newItem = document.createElement("ul");
-		newItem.setAttribute('id',itemName);
-		newItem.setAttribute('value',price);
-		newItem.setAttribute('name',id);
+		var newItem = HTMLelement("ul",['id:'+itemName,'value:'+price,'name:'+id]);
 		document.getElementById('orderArea').appendChild(newItem);
 		$('#'+itemName).html(Name.toUpperCase() +'  $'+price);
 		updateOrderTotal();
-		//$('#ORDER_TOTAL').html('Total:  $'+ORDER_TOTAL.toFixed(2));//force two decimal spots	
+
 	}else {modifyItemInOrder(Name,count,price,id);};
 };
 
@@ -145,6 +175,9 @@ modifyItemInOrder(Name,count,price,id):
 				Example: id = root(ELMNT_ID_SPACE_CHAR)parent(ELMNT_ID_SPACE_CHAR)child(ELMNT_ID_SPACE_CHAR)item
 				(ELMNT_ID_SPACE_CHAR) is a GLOBAL VAR
 	PURPOSE: add the clicked menu item modifier to the orderArea div. 
+	OTHER FUNCTIONS USED:
+			updateOrderTotal()
+			HTMLelement()
 	OUT: nothing
 */
 function modifyItemInOrder(Name,count,price,id) {
@@ -156,16 +189,11 @@ function modifyItemInOrder(Name,count,price,id) {
 		var itemToModify = $('#orderArea').children().last();};//modify the last item that was added
 		
 	var itemName = Name+'-'+count;//creates unique
-	var newItem = document.createElement("li");
-	//var price = parseFloat(price);
-	//ORDER_TOTAL += price;
-	newItem.setAttribute('name',id);
-	newItem.setAttribute('id',itemName);
-	newItem.setAttribute('value',price);
+	var newItem = HTMLelement("li",['name:'+id,'id:'+itemName,'value:'+price]);
+
 	itemToModify.append(newItem);
 	$('#'+itemName).html(Name.toUpperCase() +'  $'+price);
-	updateOrderTotal()
-	//$('#ORDER_TOTAL').html('Total:  $'+ORDER_TOTAL.toFixed(2));
+	updateOrderTotal();
 }	
 	
 /*
@@ -175,25 +203,38 @@ display_CategoryView(parentDiv):
 		 of the 'terminal' element clicked and display the content in 
 		 'categoryView' which is the middle column in view.  
 		 If there is content in 'categoryView' div already remove
-		it and return to it's correct parent in 'terminal'.  
+		it and return to it's correct parent in 'terminal'. 
+	OTHER FUNCTIONS USED:
+			none
 	OUT: nothing
 */
 function display_CategoryView(parentDiv) {
+	var smallDsply;
+
+	if (SCREEN_WIDTH_MEDIA_QUERY>=screen.width) { smallDsply = true;}
+	else {smallDsply = false;};
+	
+	smallDsply=false;//hard OVERIDE
+	
 	var previousSelection = $('.ActiveCategory');
+	console.log(previousSelection);
+	console.log(parentDiv.hasClass('ActiveCategory'));
+	if(smallDsply && parentDiv.hasClass('ActiveCategory')){parentDiv.children().toggle();};
 	var view = $('#categoryView');
 
-	if (previousSelection.length>0) {
+	if (previousSelection.length>0 && !smallDsply) {
 		view.find('*').css('display','none');
 		view.children().not('#itemView').appendTo($('#'+previousSelection[0].id));//dont remove the #itemView element when returning data to parent
-	};
+	}else {previousSelection.find('*').css('display','none');}
 	
-	//parentDiv.children().prependTo(view);
-		//make 'mods' below all of the items
-	parentDiv.children().not("[name='mods']").prependTo(view);
-	parentDiv.children("[name='mods']").appendTo(view);
+	//make 'mods' below all of the items
+	if(!smallDsply){ parentDiv.children().not("[name='mods']").prependTo(view);
+	parentDiv.children("[name='mods']").appendTo(view);}
+	else {parentDiv.children("[name='mods']").appendTo(parentDiv);};
 
    if(view.children().css('display') ==='none'){
-			view.children().toggle();};
+			view.children().toggle();}
+	else {parentDiv.children().toggle();};
 			
 	previousSelection.removeClass("ActiveCategory");
 	parentDiv.addClass("ActiveCategory");
@@ -207,31 +248,40 @@ display_ItemView(parentDiv):
 		 underneath in the 'itemView' element.  
 		 If there is content in 'item' div already remove
 		it and return to it's correct parent.  
+	OTHER FUNCTIONS USED:
+			none
+			
 	OUT: nothing
 */
 function display_ItemView(parentDiv) {
 
+	var smallDsply;
+	if (SCREEN_WIDTH_MEDIA_QUERY>=screen.width) { smallDsply = true;}
+	else {smallDsply = false;};
+	
+	smallDsply=false;//hard OVERIDE	
+	
 	var previousSelection = $(".ActiveItem");
 	var view = $('#itemView');
 
-	if (view.children().length>0) {
+	if (view.children().length>0 && !smallDsply) {
 		view.children().find('*').css('display','none');
 		view.children().appendTo(previousSelection);
-		view.empty();
-	}
-	view.empty();
+		view.empty();}
+	else {previousSelection.find('*').css('display','none');}
+
 	previousSelection.removeClass("ActiveItem");
 	parentDiv.addClass("ActiveItem");
 	
 	//make 'mods' below all of the items
-	parentDiv.children().not("[name='mods']").prependTo(view);
-	parentDiv.children("[name='mods']").appendTo(view);
+	if(!smallDsply){ parentDiv.children().not("[name='mods']").prependTo(view);
+	parentDiv.children("[name='mods']").appendTo(view);}
+	else {parentDiv.children("[name='mods']").appendTo(parentDiv);};
 
-	parentDiv.siblings().children().not('#itemView').css('display','none');
+	if(!smallDsply){parentDiv.siblings().children().not('#itemView').css('display','none');
 	view.css('display','block');
-	view.children().toggle();
-
-	
+	view.children().toggle();}
+	else {parentDiv.children().toggle();}
 };
 /*
 display_ItemModifiers(mods):
@@ -239,6 +289,9 @@ display_ItemModifiers(mods):
 	PURPOSE: Display content to user. modifiers are a special kind 'subbutton'
 				simply toggle hide/show don't move content around because the
 				modifier button is already in the right view location if it's visible to user
+	OTHER FUNCTIONS USED:
+			none
+			
 	OUT: nothing
 */
 function display_ItemModifiers(mods) {
@@ -252,6 +305,9 @@ ItemDepthInTree(itemNameString):
 		Example: id = root(ELMNT_ID_SPACE_CHAR)parent(ELMNT_ID_SPACE_CHAR)child(ELMNT_ID_SPACE_CHAR)item
 				(ELMNT_ID_SPACE_CHAR) is a GLOBAL VAR
 	PURPOSE: Determine where the clicked element and it's associated category
+	OTHER FUNCTIONS USED:
+			none
+			
 	OUT: an array of all occurrence of 'ELMNT_ID_SPACE_CHAR'.  if empty, didn't occur.  
 			each occurrence represents a down the DOM nested structure and JSON
 */
@@ -268,6 +324,9 @@ updateOrderTotal():
 	IN: nothing
 	PURPOSE:  get the 'value' attribute of all items in the 'orderArea'  add them up
 				and assign result to the global ORDER_TOTAL.
+	OTHER FUNCTIONS USED:
+			none
+	OUT: set global ORDER_TOTAL
 */
 function updateOrderTotal() {
 var all_items_ordered= 	document.getElementById('orderArea').getElementsByTagName("*");
@@ -278,6 +337,46 @@ for (i=0;i < all_items_ordered.length; i++) {
 	};
 $('#orderTotal').html('Total:  $'+ORDER_TOTAL.toFixed(2));//force 2 decimals
 };
+
+
+/*
+checkBootstrap_col_class()
+	IN: nothing
+	PURPOSE: check what bootstrap grid class is being used on terminal.
+				determine at what screen width bootstrap responsive view kicks in
+				change how click handlers for category and item view work.
+	OTHER FUNCTIONS USED:
+			none
+			
+	OUT: set global SCREEN_WIDTH_MEDIA_QUERY
+*/
+function checkBootstrap_col_class() {
+//BOOTSTRAP grid class widths
+/*
+.col-xs-*: none (auto)
+.col-sm-*: 750px
+.col-md-*: 970px
+.col-lg-*: 1170px */
+
+	var terminal_col_class = document.getElementById('terminal').getAttribute('class');
+	terminal_col_class = terminal_col_class.substring(terminal_col_class.indexOf("col-")+4,terminal_col_class.indexOf("col-")+6);
+
+	switch(terminal_col_class) {
+		case 'xs':
+					SCREEN_WIDTH_MEDIA_QUERY = 0;
+					break;
+		case 'sm':
+					SCREEN_WIDTH_MEDIA_QUERY = 750;
+					break;
+		case 'md':
+					SCREEN_WIDTH_MEDIA_QUERY = 970;
+					break;
+		case 'lg':
+					SCREEN_WIDTH_MEDIA_QUERY = 1170;
+					break;
+		};
+};
+
 
 /*
 assign_ClickHandlers():
@@ -291,12 +390,13 @@ GLOBALS USED:
 	ORDER_DATA
 	ORDER_TOTAL
 
-FUNCTIONS USED:
+OTHER FUNCTIONS USED:
 	addItemToOrder()
 	display_ItemView()
 	display_ItemModifiers()
 	display_CategoryView()
 	ItemDepthInTree()
+	updateOrderTotal()
 */
 
 function assign_ClickHandlers() {
@@ -334,8 +434,8 @@ function assign_ClickHandlers() {
 				});
 			
 	/*---- SUBBUTTON Class Click Event-----*/	
-			$('.subbutton').not("[name='mods']").click (function (event) { 
-					display_ItemView($(this));				
+			$('.subbutton').not("[name='mods']").click (function (event) { 				
+					display_ItemView($(this));		
 				event.stopPropagation();
 				});
 				
@@ -406,12 +506,13 @@ function assign_ClickHandlers() {
 };
 
 $(document).ready(function(){
+	//test
+	HTMLelement("div",['class:button item','id:xyz']);	
+	HTMLelement("div",['class:test','id:terminal']);	
+	
 	//determine what size screen bootstrap will switch to responsive layout
 	checkBootstrap_col_class();
-	var terminal_col_class = document.getElementById('terminal').getAttribute('class');
-	console.log(terminal_col_class);
-	terminal_col_class = terminal_col_class.substring(terminal_col_class.indexOf("-")+1,terminal_col_class.indexOf("-")+3);
-	console.log(terminal_col_class);
+
 	mySocket = io.connect();//create new websocket, 
 	
 	/* ON LOAD sending a json with key term 'buttonBuilder'
