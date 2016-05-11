@@ -15,13 +15,41 @@ socketio = SocketIO(app)
 NOTE! error right now if keys contain white-space "my food" >change to> "my_food"
 '''
 buttons = {'buttonBuilder': 
-                {'Appetizers':
-                    {'Chicken':{'buffalo_wings':{'price':'10.50',
+                {'Pizza':
+                    {'build_pizza':{'mods':{#'ObjectProperties':{'htmlTEXT':'toppings'},  DEVELOP WAY TO PASS PROPERTIES
+                    									'cheese':{'price':'0.00'},
+                           						'pepperoni':{'price':'.00'},
+                           						'onions':{'price':'1.00'}}}, 
+                    'Specialty_pizza':{'meat_lover':{'price':'10.50',
+                           				 			 		'mods':{'small':{'price':'0.00'},
+                           				 			 					'medium':{'price':'1.00'},
+                           							 					'large':{'price':'2.00'}}},
+                       							'hawaiian':{'price':'9.50',
+                           				 			 		'mods':{'small':{'price':'0.00'},
+                           				 			 					'medium':{'price':'1.00'},
+                           							 					'large':{'price':'2.00'}}},                        	
+                       					'buffalo_chickem':{'price':'9.75',
+                           				 			 		'mods':{'small':{'price':'0.00'},
+                           				 			 					'medium':{'price':'1.00'},
+                           							 					'large':{'price':'2.00'}}},
+                      								'veggie':{'price':'7.75',
+                           				 			 		'mods':{'small':{'price':'0.00'},
+                           				 			 					'medium':{'price':'1.00'},
+                           							 					'large':{'price':'2.00'}}}},
+                   				   'mods':{'ExtraSauce':{'price':'0.50'},
+                             					'ExtraCheese':{'price':'.50'},
+                             				   'square_cut':{'price':'0.0'}}},                    
+             
+                  'Appetizers':
+                    {'Onion_Rings':{'price':'10.50',
+                           			'mods':{'regular':{'price':'0.00'},
+                           						'large':{'price':'1.00'}}}, 
+                    'Chicken':{'buffalo_wings':{'price':'10.50',
                            				 			 'mods':{'mild':{'price':'0.00'},
                            							 			'hot':{'price':'0.00'}}},
                        				'bbq_wings':{'price':'9.50'},                        	
                        				'honey_wings':{'price':'9.75'},
-                      				'mozzarella sticks':{'price':'7.75'},
+                      				'mozzarella_sticks':{'price':'7.75'},
                    				   'mods':{'ExtraSauce':{'price':'0.50'},
                              					'marinara':{'price':'0.50'},
                              				   'blueCheese':{'price':'0.50'}}
@@ -133,4 +161,4 @@ def handle_message(data):
     
 
 if __name__ == '__main__':
-    socketio.run(app,host='10.10.10.31',port=8000)
+    socketio.run(app,host='192.168.1.103',port=8000)

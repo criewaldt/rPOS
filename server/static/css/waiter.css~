@@ -1,10 +1,11 @@
 #orderArea{
+	
 	border-style: solid;
 	border-color: #000000;
 	border-width: 4px;
 	border-radius: 15px;
 	overflow-y: auto;
-	position : relative; bottom:-100;
+	position : relative; bottom:-1000;
 	text-align: justify;}
 
 ul{
@@ -28,8 +29,17 @@ text-align: right;
 padding-right: 0px;
 }
 #itemView{
+	border-radius: 15px;
+	border-style: solid;
+	border-color: #FBB117;
 	display: block;
 	width: 100%;
+	z-index: 0;
+}
+
+#categoryView{
+
+	z-index: 999;
 }
 .button{
 	background: -webkit-radial-gradient(#FF5050, #FF0A0A);
@@ -63,7 +73,7 @@ padding-right: 0px;
 	
 	overflow:hidden;
 	display: none;
-	width: 50%;
+	width: 30%;
 	float: left;
 	text-align: center;
 	vertical-align: middle;
@@ -78,6 +88,7 @@ padding-right: 0px;
 	white-space: nowrap;	
 	overflow:hidden;
 	display: none;
+	clear: both;
 	width: 30%;
 	float: inherit;
 	text-align: center;
@@ -98,9 +109,6 @@ p.item > p{
 	background: radial-gradient(white, orange);
 	}	
 
-.item:hover{
-	background-color:yellow;
-	text-align: center;}
 	
 #sendOrder{
 	float: right;
