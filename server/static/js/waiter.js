@@ -28,9 +28,7 @@ function ButtonBuilder(obj,parentKey,id) {
 	var elementProperties = false;
 	for (var x =0; x<childKey.length;x++) {
 		if (childKey[x]  === 'ObjectProperties'){
-		elementProperties = obj[parentKey][childKey[x]];
-		console.log(elementProperties);
-		var remove = childKey.splice(x,1);
+		childKey.splice(x,1);//remove ObjectProperties
 		};
 	};
 	
@@ -39,6 +37,9 @@ function ButtonBuilder(obj,parentKey,id) {
 	//since properties of an object: price, modification, etc are NOT Object.
 	if (obj instanceof Object) {
 		for (var i=0;i<childKey.length;i++) {
+			if (obj[parentKey][childKey[i]].ObjectProperties) {
+			elementProperties = obj[parentKey][childKey[i]].ObjectProperties;}
+			
 			var jsonID = id+ELMNT_ID_SPACE_CHAR+[childKey[i]];
 			//if id has 'spacer' GLOBAL VAR as first character, skip over it so ID starts with a letter
 			if (jsonID.charAt(0)==ELMNT_ID_SPACE_CHAR) {jsonID = jsonID.substring(1);};				
@@ -79,8 +80,8 @@ HTMLgenerator():
 			HTMLelement()
 	OUT: nothing			
 */
-function HTMLgenerator(id,parentDiv,elementProperties) {
-	console.log(elementProperties);
+function HTMLgenerator(id,parentDiv,styleProps) {
+
 	
 	if (parentDiv==="") {parentDiv='terminal';};//the root element of JSON is added to the terminal
 
@@ -89,9 +90,9 @@ function HTMLgenerator(id,parentDiv,elementProperties) {
 		var nm = id.substring(id.lastIndexOf(ELMNT_ID_SPACE_CHAR)+1);//string split ID for elements name attribute
 		
 		if (parentDiv==='terminal') {
-			var newDiv = HTMLelement("div",{ID:id,NAME:nm,CLASS:'button',innerHTML:nm.toUpperCase(),elementProperties});
+			var newDiv = HTMLelement("div",{ID:id,NAME:nm,CLASS:'button',innerHTML:nm.toUpperCase(),styleProps});
 		}else {
-			var newDiv = HTMLelement("div",{ID:id,NAME:nm,CLASS:'subbutton',innerHTML:nm.toUpperCase()});
+			var newDiv = HTMLelement("div",{ID:id,NAME:nm,CLASS:'subbutton',innerHTML:nm.toUpperCase(),styleProps});
 		}
 		
 		document.getElementById(parentDiv).appendChild(newDiv);
@@ -114,7 +115,9 @@ function HTMLelement(a) {
 	//use splice to get the first argument, that is the 'type' of element to create
 	var elementProperties = Array.prototype.splice.call(arguments,1);
 	var Element = document.createElement(a);
-	
+	if(elementProperties[0].styleProps){console.log(elementProperties[0].styleProps)
+	$.extend(elementProperties[0],elementProperties[0].styleProps);
+	};
 		//add properties 
 		if (elementProperties[0].CLASS) {
 			Element.setAttribute('class',elementProperties[0].CLASS);
@@ -157,10 +160,10 @@ createItem(id,parentDiv,price):
 			none
 	OUT: nothing
 */
-function createItem(id,parentDiv,elementProperties,price){
+function createItem(id,parentDiv,styleProps,price){
 
 	var nm = id.substring(id.lastIndexOf(ELMNT_ID_SPACE_CHAR)+1);//create var for elements name attribute
-	var newItem = HTMLelement("p",{CLASS:'item stockYES',ID:id,VALUE:price,NAME:nm,innerHTML:nm.toUpperCase()});
+	var newItem = HTMLelement("p",{CLASS:'item stockYES',ID:id,VALUE:price,NAME:nm,innerHTML:nm.toUpperCase(),styleProps});
 	document.getElementById(parentDiv).appendChild(newItem);
 };
 /*
