@@ -21,7 +21,7 @@ buttons = {'buttonBuilder':
                 {'Pizza':
                     {'build_pizza':{'mods':{'ObjectProperties':{'innerHTML':'toppings'},  #DEVELOP WAY TO PASS PROPERTIES
                     									'cheese':{'price':'0.00'},
-                           						'pepperoni':{'price':'.00'},
+                           						'pepperoni':{'price':'.00','ObjectProperties':{'COLOR':'red'}},
                            						'onions':{'price':'1.00'}}}, 
                     'Specialty_pizza':{'meat_lover':{'price':'10.50',
                            				 			 		'mods':{'small':{'price':'0.00'},
