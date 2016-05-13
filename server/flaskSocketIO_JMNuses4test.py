@@ -14,9 +14,12 @@ socketio = SocketIO(app)
 '''
 NOTE! error right now if keys contain white-space "my food" >change to> "my_food"
 '''
+confirmReceipt = {'confirmReceipt':
+								{'received':'true'}}
+
 buttons = {'buttonBuilder': 
                 {'Pizza':
-                    {'build_pizza':{'mods':{#'ObjectProperties':{'htmlTEXT':'toppings'},  DEVELOP WAY TO PASS PROPERTIES
+                    {'build_pizza':{'mods':{'ObjectProperties':{'innerHTML':'toppings'},  #DEVELOP WAY TO PASS PROPERTIES
                     									'cheese':{'price':'0.00'},
                            						'pepperoni':{'price':'.00'},
                            						'onions':{'price':'1.00'}}}, 
@@ -139,26 +142,28 @@ def index():
 
 @socketio.on('connect', namespace='/')
 def test_connect():
-    print "new connection"
+		  print "new connection"
     
 
 
 @socketio.on('message')
 def handle_message(data):
-    dataIN = json.loads(data)
-    print dataIN
-    print dataIN.itervalues().next()
-    print dataIN.iterkeys().next()
-    if dataIN.iterkeys().next() == "buttonBuilder":
-        send(json.dumps(buttons))
-        print "button setup sent"
-
-    else:
-        print data
-        print type(data)
-        print dataIN
-        print type(dataIN)
+	
+	 dataIN = json.loads(data)
+    
+	 if dataIN.iterkeys().next() == "buttonBuilder":
+				send(json.dumps(buttons))
+				print "button setup sent"
+   	 
+	 if dataIN.iterkeys().next() == "ORDER_DATA":
+				send(json.dumps(confirmReceipt))
+				print dataIN
+	 else:
+				print data
+				print type(data)
+				print dataIN
+				print type(dataIN)
     
 
 if __name__ == '__main__':
-    socketio.run(app,host='192.168.1.103',port=8000)
+    socketio.run(app,host='10.10.10.31',port=8000)

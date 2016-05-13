@@ -23,9 +23,16 @@ function ButtonBuilder(obj,parentKey,id) {
 	
 	if (!PAGE_IS_READY) {PAGE_IS_READY = 2;}
 	else {PAGE_IS_READY += 1;};	
-	var parentKey = parentKey;
 	var id = id || "";
 	var childKey = Object.keys(obj[parentKey]);
+	var elementProperties = false;
+	for (var x =0; x<childKey.length;x++) {
+		if (childKey[x]  === 'ObjectProperties'){
+		elementProperties = obj[parentKey][childKey[x]];
+		var remove = childKey.splice(x,1);
+		};
+	};
+	
 	
 	//to break the recursive calling of this function when obj finally becomes an actual property
 	//since properties of an object: price, modification, etc are NOT Object.
@@ -33,23 +40,27 @@ function ButtonBuilder(obj,parentKey,id) {
 		for (var i=0;i<childKey.length;i++) {
 			var jsonID = id+ELMNT_ID_SPACE_CHAR+[childKey[i]];
 			//if id has 'spacer' GLOBAL VAR as first character, skip over it so ID starts with a letter
-			if (jsonID.charAt(0)==ELMNT_ID_SPACE_CHAR) {jsonID = jsonID.substring(1);};
-			//Actual Items pass extra argument price to HTMLgenerator
+			if (jsonID.charAt(0)==ELMNT_ID_SPACE_CHAR) {jsonID = jsonID.substring(1);};				
+				
+			//Actual Items pass to createItem()
 			if (obj[parentKey][childKey[i]].price){
-				HTMLgenerator(jsonID,id,obj[parentKey][childKey[i]].price);
+				createItem(jsonID,id,elementProperties,obj[parentKey][childKey[i]].price);
 				//check if the item has item specific mods, ie' large/small, mild/medium/hot/
+				//need to make buttons for the mods
 				if (obj[parentKey][childKey[i]].mods) {
-				ButtonBuilder(obj[parentKey][childKey[i]],["mods"],jsonID);};
-				}
+				ButtonBuilder(obj[parentKey][childKey[i]],["mods"],jsonID);
+				};
+			}
+			else {	
 			//recursion, continue to work through a branch of JSON			
-			else {
-				if (obj[parentKey][childKey[i]].ObjectProperties){jsonID = jsonID+obj[parentKey][childKey[i]].ObjectProperties.innerHTML};
-			HTMLgenerator(jsonID,id);
-			ButtonBuilder(obj[parentKey],[childKey[i]],jsonID);};
-		};
+			HTMLgenerator(jsonID,id,elementProperties);
+			ButtonBuilder(obj[parentKey],[childKey[i]],jsonID);
+			};
+		}
 	}else{return;};
 	PAGE_IS_READY -= 1;
-	//All finished, PAGE_IS_READY GLOBAL Var is True
+
+	//All finished, set PAGE_IS_READY GLOBAL Var is True
 	if(PAGE_IS_READY===1){PAGE_IS_READY===true;assign_ClickHandlers();}
 	
 };
@@ -67,53 +78,68 @@ HTMLgenerator():
 			HTMLelement()
 	OUT: nothing			
 */
-function HTMLgenerator(id,parentDiv,price) {
-	var price = price || false;//menu buttons have no price, only items do
-	var id = id;
-	var parentDiv = parentDiv;
+function HTMLgenerator(id,parentDiv,elementProperties) {
+	console.log(elementProperties);
 	
 	if (parentDiv==="") {parentDiv='terminal';};//the root element of JSON is added to the terminal
+
 	
-	if (price) {createItem(id,parentDiv,price)}//items go to different builder function
-	else {
 		//isolate just the name of the item
 		var nm = id.substring(id.lastIndexOf(ELMNT_ID_SPACE_CHAR)+1);//string split ID for elements name attribute
-		var newDiv = HTMLelement("div",['id:'+id,'name:'+nm]);
+		
+		if (parentDiv==='terminal') {
+			var newDiv = HTMLelement("div",{ID:id,NAME:nm,CLASS:'button',innerHTML:nm.toUpperCase(),elementProperties});
+		}else {
+			var newDiv = HTMLelement("div",{ID:id,NAME:nm,CLASS:'subbutton',innerHTML:nm.toUpperCase()});
+		}
+		
 		document.getElementById(parentDiv).appendChild(newDiv);
 		
-		document.getElementById(id).innerHTML = nm.toUpperCase();
-			if (parentDiv==='terminal') {newDiv.setAttribute('class','button'); }
-			else {newDiv.setAttribute('class','subbutton'); }
-		}
-};
-
-function HTMLelement(Type,Attr,edit) {
-	var edit = edit || false;//bool if element is new or exists
-	var elementType = Type.toLowerCase();
-	var Element;
-
-	if (edit) {Element = document.getElementById(Type);}
-	else {Element = document.createElement(elementType);}
 	
-	if (Attr instanceof Array) {
-		var i;
-		for (i=0;i<Attr.length;i++) {
-			var attrName = Attr[i].substring(0,Attr[i].indexOf(":"));
-			var attrValue = Attr[i].substring(Attr[i].indexOf(":")+1);
-			if (attrName === 'id') {
-				var checkForElement = $('#'+attrValue);
-				if (checkForElement.length>0) {			
-					/*   UNCOMMENT BELOW  FOR ALT FUNCTIONALITY   */
-					//var Attr_id = Attr.splice(i,1);//remove ID
-					//HTMLelement(attrValue,Attr,true);
-					return;//FOR NOW DO NOTHING IF ID EXISTS
-					}
+};
+/*
+HTMLelement(a)
+	IN: a - variable argument. it is in the form
+				('elementType,{elementProperties}) where {elementProperties} is an object with variable
+				number of properties to be set for the new element
+	PURPOSE: used to create HTML elements
+	FUNCTIONS USED:
+		none
+	OUT: returns an HTML Element 
 
-				
-				}
-			Element.setAttribute(attrName, attrValue);
-			}
-	}
+*/
+function HTMLelement(a) {
+
+	//use splice to get the first argument, that is the 'type' of element to create
+	var elementProperties = Array.prototype.splice.call(arguments,1);
+	var Element = document.createElement(a);
+	
+		//add properties 
+		if (elementProperties[0].CLASS) {
+			Element.setAttribute('class',elementProperties[0].CLASS);
+		};
+		if (elementProperties[0].ID) {
+			Element.setAttribute('id',elementProperties[0].ID);
+		};
+		if (elementProperties[0].NAME) {
+			Element.setAttribute('name',elementProperties[0].NAME);
+		};
+		if (elementProperties[0].VALUE) {
+			Element.setAttribute('value',elementProperties[0].VALUE);
+		};
+		if (elementProperties[0].innerHTML) {
+				Element.innerHTML = elementProperties[0].innerHTML;
+		};
+		if (elementProperties[0].BACKGROUND_COLOR) {
+				Element.style.backgroundColor = elementProperties[0].BACKGROUND_COLOR;
+		};
+		if (elementProperties[0].COLOR) {
+				Element.style.color = elementProperties[0].COLOR;
+		};
+		if (elementProperties[0].FONT_SIZE) {
+			console.log(elementProperties[0].BACKGROUND_COLOR);
+				Element.style.fontSize = elementProperties[0].FONT_SIZE;
+		};
 	return Element;
 };
 
@@ -130,14 +156,11 @@ createItem(id,parentDiv,price):
 			none
 	OUT: nothing
 */
-function createItem(id,parentDiv,price){
-	var id =id;
-	var parentDiv = parentDiv;
-	var price = price;
+function createItem(id,parentDiv,elementProperties,price){
+
 	var nm = id.substring(id.lastIndexOf(ELMNT_ID_SPACE_CHAR)+1);//create var for elements name attribute
-	var newItem = HTMLelement("p",['class:item stockYES','id:'+id,'value:'+price,'name:'+nm]);
+	var newItem = HTMLelement("p",{CLASS:'item stockYES',ID:id,VALUE:price,NAME:nm,innerHTML:nm.toUpperCase()});
 	document.getElementById(parentDiv).appendChild(newItem);
-	document.getElementById(id).innerHTML = nm.toUpperCase();
 };
 /*
 addItemToOrder(Name,count,price,mod):
@@ -158,7 +181,7 @@ function addItemToOrder(id,count,price,mod){
 	if (!modify) {
 	//	ORDER_TOTAL += parseFloat(price);
 		var itemName = Name+'-'+count;
-		var newItem = HTMLelement("ul",['id:'+itemName,'value:'+price,'name:'+id]);
+		var newItem = HTMLelement("ul",{ID:itemName,VALUE:price,NAME:id});
 		document.getElementById('orderArea').appendChild(newItem);
 		$('#'+itemName).html(Name.toUpperCase() +'  $'+price);
 		updateOrderTotal();
@@ -189,7 +212,7 @@ function modifyItemInOrder(Name,count,price,id) {
 		var itemToModify = $('#orderArea').children().last();};//modify the last item that was added
 		
 	var itemName = Name+'-'+count;//creates unique
-	var newItem = HTMLelement("li",['name:'+id,'id:'+itemName,'value:'+price]);
+	var newItem = HTMLelement("li",{NAME:id,ID:itemName,VALUE:price});
 
 	itemToModify.append(newItem);
 	$('#'+itemName).html(Name.toUpperCase() +'  $'+price);
@@ -255,33 +278,32 @@ display_ItemView(parentDiv):
 */
 function display_ItemView(parentDiv) {
 
-	var smallDsply;
-	if (SCREEN_WIDTH_MEDIA_QUERY>=screen.width) { smallDsply = true;}
-	else {smallDsply = false;};
-	
-	smallDsply=false;//hard OVERIDE	
-	
 	var previousSelection = $(".ActiveItem");
-	var view = $('#itemView');
 
-	if (view.children().length>0 && !smallDsply) {
-		view.children().find('*').css('display','none');
+	var view = $('#itemView');
+   
+   //put the elements being viewed back to their parent
+	if (view.children().length>0 ) {
 		view.children().appendTo(previousSelection);
 		view.empty();}
-	else {previousSelection.find('*').css('display','none');}
 
 	previousSelection.removeClass("ActiveItem");
 	parentDiv.addClass("ActiveItem");
 	
-	//make 'mods' below all of the items
-	if(!smallDsply){ parentDiv.children().not("[name='mods']").prependTo(view);
-	parentDiv.children("[name='mods']").appendTo(view);}
-	else {parentDiv.children("[name='mods']").appendTo(parentDiv);};
+	//toggle the button if it's the same one pressed
+	if(previousSelection.attr('id') === parentDiv.attr('id')){
+		previousSelection.children().toggle();
+		parentDiv.removeClass("ActiveItem");		
+		return;};
 
-	if(!smallDsply){parentDiv.siblings().children().not('#itemView').css('display','none');
+	//make 'mods' below all of the items
+   parentDiv.children().not("[name='mods']").prependTo(view);
+	parentDiv.children("[name='mods']").appendTo(view);
+
+	parentDiv.siblings().children().not('#itemView').css('display','none');
 	view.css('display','block');
-	view.children().toggle();}
-	else {parentDiv.children().toggle();}
+	view.children().toggle();
+	
 };
 /*
 display_ItemModifiers(mods):
@@ -506,9 +528,8 @@ function assign_ClickHandlers() {
 };
 
 $(document).ready(function(){
-	//test
-	HTMLelement("div",['class:button item','id:xyz']);	
-	HTMLelement("div",['class:test','id:terminal']);	
+	/*test HTMLelement()*/
+	//$('#terminal').append(HTMLelement("div",{CLASS:"test",innerHTML:'test',ID:"xyz",BACKGROUND_COLOR:'red'}));
 	
 	//determine what size screen bootstrap will switch to responsive layout
 	checkBootstrap_col_class();
@@ -536,6 +557,13 @@ $(document).ready(function(){
 			if (Object.keys(JSONdata)[0] === 'buttonBuilder'){
 				console.log(JSONdata);
 				ButtonBuilder(JSONdata,'buttonBuilder');
+			}
+			if (Object.keys(JSONdata)[0] === 'confirmReceipt'){
+				if (JSONdata.confirmReceipt.received ==='true') {
+					console.log('Order was received');
+				};
+				
+				
 			};
 			
 		});
