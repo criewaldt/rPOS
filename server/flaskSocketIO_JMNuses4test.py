@@ -19,9 +19,9 @@ confirmReceipt = {'confirmReceipt':
 
 buttons = {'buttonBuilder': 
                 {'Pizza':
-                    {'build_pizza':{'mods':{'ObjectProperties':{'innerHTML':'toppings'},  #DEVELOP WAY TO PASS PROPERTIES
+                    {'build_pizza':{'mods':{'CustomStyle':{'innerHTML':'toppings'},  #DEVELOP WAY TO PASS PROPERTIES
                     									'cheese':{'price':'0.00'},
-                           						'pepperoni':{'price':'.00','ObjectProperties':{'COLOR':'red'}},
+                           						'pepperoni':{'price':'.00','CustomStyle':{'COLOR':'red'}},
                            						'onions':{'price':'1.00'}}}, 
                     'Specialty_pizza':{'meat_lover':{'price':'10.50',
                            				 			 		'mods':{'small':{'price':'0.00'},
@@ -166,4 +166,4 @@ def handle_message(data):
     
 
 if __name__ == '__main__':
-    socketio.run(app,host='10.10.10.31',port=8000)
+    socketio.run(app,host='192.168.1.103',port=8000)
