@@ -20,15 +20,16 @@ ButtonBuilder():
 */
 
 function ButtonBuilder(obj,parentKey,id) {
-	
+	//PAGE_IS_READY will be 1 when the whole JSON is traversed
 	if (!PAGE_IS_READY) {PAGE_IS_READY = 2;}
 	else {PAGE_IS_READY += 1;};	
+	
 	var id = id || "";
 	var childKey = Object.keys(obj[parentKey]);
-	var elementProperties = false;
+	var CustomStyle = false;
 	for (var x =0; x<childKey.length;x++) {
-		if (childKey[x]  === 'ObjectProperties'){
-		childKey.splice(x,1);//remove ObjectProperties
+		if (childKey[x]  === 'CustomStyle'){
+		childKey.splice(x,1);//remove CustomStyle
 		};
 	};
 	
@@ -37,8 +38,10 @@ function ButtonBuilder(obj,parentKey,id) {
 	//since properties of an object: price, modification, etc are NOT Object.
 	if (obj instanceof Object) {
 		for (var i=0;i<childKey.length;i++) {
-			if (obj[parentKey][childKey[i]].ObjectProperties) {
-			elementProperties = obj[parentKey][childKey[i]].ObjectProperties;}
+			
+			//check if the obj has custom style prop
+			if (obj[parentKey][childKey[i]].CustomStyle) {
+			CustomStyle = obj[parentKey][childKey[i]].CustomStyle;}
 			
 			var jsonID = id+ELMNT_ID_SPACE_CHAR+[childKey[i]];
 			//if id has 'spacer' GLOBAL VAR as first character, skip over it so ID starts with a letter
@@ -46,7 +49,7 @@ function ButtonBuilder(obj,parentKey,id) {
 				
 			//Actual Items pass to createItem()
 			if (obj[parentKey][childKey[i]].price){
-				createItem(jsonID,id,elementProperties,obj[parentKey][childKey[i]].price);
+				createItem(jsonID,id,CustomStyle,obj[parentKey][childKey[i]].price);
 				//check if the item has item specific mods, ie' large/small, mild/medium/hot/
 				//need to make buttons for the mods
 				if (obj[parentKey][childKey[i]].mods) {
@@ -55,7 +58,7 @@ function ButtonBuilder(obj,parentKey,id) {
 			}
 			else {	
 			//recursion, continue to work through a branch of JSON			
-			HTMLgenerator(jsonID,id,elementProperties);
+			HTMLgenerator(jsonID,id,CustomStyle);
 			ButtonBuilder(obj[parentKey],[childKey[i]],jsonID);
 			};
 		}
@@ -80,7 +83,7 @@ HTMLgenerator():
 			HTMLelement()
 	OUT: nothing			
 */
-function HTMLgenerator(id,parentDiv,styleProps) {
+function HTMLgenerator(id,parentDiv,CustomStyle) {
 
 	
 	if (parentDiv==="") {parentDiv='terminal';};//the root element of JSON is added to the terminal
@@ -90,9 +93,9 @@ function HTMLgenerator(id,parentDiv,styleProps) {
 		var nm = id.substring(id.lastIndexOf(ELMNT_ID_SPACE_CHAR)+1);//string split ID for elements name attribute
 		
 		if (parentDiv==='terminal') {
-			var newDiv = HTMLelement("div",{ID:id,NAME:nm,CLASS:'button',innerHTML:nm.toUpperCase(),styleProps});
+			var newDiv = HTMLelement("div",{ID:id,NAME:nm,CLASS:'button',innerHTML:nm,CustomStyle});
 		}else {
-			var newDiv = HTMLelement("div",{ID:id,NAME:nm,CLASS:'subbutton',innerHTML:nm.toUpperCase(),styleProps});
+			var newDiv = HTMLelement("div",{ID:id,NAME:nm,CLASS:'subbutton',innerHTML:nm,CustomStyle});
 		}
 		
 		document.getElementById(parentDiv).appendChild(newDiv);
@@ -103,7 +106,9 @@ function HTMLgenerator(id,parentDiv,styleProps) {
 HTMLelement(a)
 	IN: a - variable argument. it is in the form
 				('elementType,{elementProperties}) where {elementProperties} is an object with variable
-				number of properties to be set for the new element
+				number of properties to be set for the new element.  Sometimes custom properties for style are sent.
+				for example change background color, text size or inner html. these come in as the property : stylProps.
+				they overwrite defaults.
 	PURPOSE: used to create HTML elements
 	FUNCTIONS USED:
 		none
@@ -115,7 +120,12 @@ function HTMLelement(a) {
 	//use splice to get the first argument, that is the 'type' of element to create
 	var elementProperties = Array.prototype.splice.call(arguments,1);
 	var Element = document.createElement(a);
-	if(elementProperties[0].styleProps){console.log(elementProperties[0].styleProps)};
+	console.log(elementProperties[0]);
+	//check if 'custom' style properties were sent
+	if(elementProperties[0].CustomStyle){
+		//overwrite the defaults from HTMLgenerator() and createItem() with CustomStyle
+	$.extend(elementProperties[0],elementProperties[0].CustomStyle);
+	};
 		//add properties 
 		if (elementProperties[0].CLASS) {
 			Element.setAttribute('class',elementProperties[0].CLASS);
@@ -139,7 +149,6 @@ function HTMLelement(a) {
 				Element.style.color = elementProperties[0].COLOR;
 		};
 		if (elementProperties[0].FONT_SIZE) {
-			console.log(elementProperties[0].BACKGROUND_COLOR);
 				Element.style.fontSize = elementProperties[0].FONT_SIZE;
 		};
 	return Element;
@@ -158,10 +167,10 @@ createItem(id,parentDiv,price):
 			none
 	OUT: nothing
 */
-function createItem(id,parentDiv,styleProps,price){
+function createItem(id,parentDiv,CustomStyle,price){
 
 	var nm = id.substring(id.lastIndexOf(ELMNT_ID_SPACE_CHAR)+1);//create var for elements name attribute
-	var newItem = HTMLelement("p",{CLASS:'item stockYES',ID:id,VALUE:price,NAME:nm,innerHTML:nm.toUpperCase(),styleProps});
+	var newItem = HTMLelement("p",{CLASS:'item stockYES',ID:id,VALUE:price,NAME:nm,innerHTML:nm,CustomStyle});
 	document.getElementById(parentDiv).appendChild(newItem);
 };
 /*
@@ -362,6 +371,18 @@ for (i=0;i < all_items_ordered.length; i++) {
 $('#orderTotal').html('Total:  $'+ORDER_TOTAL.toFixed(2));//force 2 decimals
 };
 
+/*
+create_orderData_json()
+*/
+function create_orderData_json(){
+	var orderArea = $('#orderArea');
+	console.log(orderArea.children().length);
+   for (var i=0; i<orderArea.children().length; i++){
+	console.log(orderArea.children().attr('name'));
+	}
+};
+
+
 
 /*
 checkBootstrap_col_class()
@@ -477,10 +498,10 @@ function assign_ClickHandlers() {
 	/*---- orderArea Class Click Event-----*/	
 			$(".orderArea").click (function (event) {
 
-				var currentItem = $(".editItem");
+				var currentItem = $(".editItem");//nothing if no element with class editItem
 				var Clicked = $(event.target);
 				
-				//area not item was clicked
+				//orderArea not div, not an item was clicked
 				if ( Clicked.parent().context.id === "orderArea"){return;}
 				
 				//turn 'editItem' off, same item was clicked
@@ -503,6 +524,8 @@ function assign_ClickHandlers() {
 	/*---- remove button Click Event-----*/		
 			$("#remove").click (function (event) {
 				var currentItem = $(".editItem");
+				console.log(currentItem);
+				
 				//if currentItem has child modifiers remove them
 				while(currentItem.children().length>0){
 					currentItem.children().first().remove();
@@ -544,9 +567,9 @@ $(document).ready(function(){
 	mySocket.send(JSON.stringify({'buttonBuilder':1}));
 	
 	document.getElementById('sendOrder').onclick = function (){
-		alert();
+		create_orderData_json();
 		mySocket.send(JSON.stringify(ORDER_DATA));
-		$('#orderArea').empty();
+		//$('#orderArea').empty();
 	};
 
 	/* FUNCTION TO READ INBOUND DATA*/
