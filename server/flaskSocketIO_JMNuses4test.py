@@ -21,7 +21,9 @@ buttons = {'buttonBuilder':
                 {'Pizza':
                     {'build_pizza':{'mods':{'CustomStyle':{'innerHTML':'toppings'},  #DEVELOP WAY TO PASS PROPERTIES
                     									'cheese':{'price':'0.00'},
-                           						'pepperoni':{'price':'.00','CustomStyle':{'COLOR':'red'}},
+                           						'pepperoni':{'price':'.00',
+                           										 'itemInfo':{'coupon':'XYZ_deal','ingredients':'xyz_ingreed'},
+                           										'CustomStyle':{'color':'red'}},
                            						'onions':{'price':'1.00'}}}, 
                     'Specialty_pizza':{'meat_lover':{'price':'10.50',
                            				 			 		'mods':{'small':{'price':'0.00'},
