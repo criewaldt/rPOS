@@ -3,10 +3,10 @@ window.mySocket;//setup global var for the websocket
 var SCREEN_WIDTH_MEDIA_QUERY;  //used to check what bootstrap col-* class is being used to switch to responsive
 var ORDER_DATA = {'ORDER_DATA' : {}};
 var ORDER_TOTAL = 0.00;      
-var ELMNT_ID_SPACE_CHAR = "-";   //space char in element name attr to denote location in buttonBuilder json
+var ELMNT_ID_SPACE_CHAR = ".";   //space char in element name attr to denote location in buttonBuilder json
 var PAGE_IS_READY = false;//used to test when all html is built
 var WAIT_FOR_USER = false;//used to prevent new input if waiting for a selection from user
-
+var BUTTON_BUILDER;// used to hold the JSON sent from server used to build .... everything
 /*-------These Function are used to build buttons on the screen--------
 ButtonBuilder():
 	IN: obj - a json
@@ -107,7 +107,7 @@ HTMLelement(a)
 	IN: a - variable argument. it is in the form
 				('elementType,{elementProperties}) where {elementProperties} is an object with variable
 				number of properties to be set for the new element.  Sometimes custom properties for style are sent.
-				for example change background color, text size or inner html. these come in as the property : stylProps.
+				for example change background color, text size or inner html. these come in as the property : CustomStyle.
 				they overwrite defaults.
 	PURPOSE: used to create HTML elements
 	FUNCTIONS USED:
@@ -124,7 +124,7 @@ function HTMLelement(a) {
 	
 	//check if 'custom' style properties were sent
 	if(elementProperties[0].CustomStyle){
-		//overwrite the defaults from HTMLgenerator() and createItem() with CustomStyle
+	//if 'custom' styles, overwrite the defaults from HTMLgenerator() and createItem() with CustomStyle
 	$.extend(elementProperties[0],elementProperties[0].CustomStyle);
 	};
 		//add properties 
@@ -291,7 +291,6 @@ display_ItemView(parentDiv):
 		it and return to it's correct parent.  
 	OTHER FUNCTIONS USED:
 			none
-			
 	OUT: nothing
 */
 function display_ItemView(parentDiv) {
@@ -320,8 +319,7 @@ function display_ItemView(parentDiv) {
 
 	parentDiv.siblings().children().not('#itemView').css('display','none');
 	view.css('display','block');
-	view.children().toggle();
-	
+	view.children().toggle();	
 };
 /*
 display_ItemModifiers(mods):
@@ -385,15 +383,21 @@ create_orderData_json()
 this function needs to grab everything in orderArea and pack into a json
 this will replace the direct adding to ORDER_TOTAL in updateOrderTotal
 
+idea now is to itterate the children of orderArea, check if each element has children
+of its own (these are the modifiers) and add to the ORDER_DATA json
+//ORDER_DATA = {'ORDER_DATA' : {}};
+
 */
 function create_orderData_json(){
 	var orderArea = $('#orderArea');
-	console.log(orderArea.children().length);
-   for (var i=0; i<orderArea.children().length; i++){
-	console.log(orderArea.children().attr('name'));
+	//console.log(orderArea.children().length);
+	//console.log(orderArea[0].childNodes);
+   for (var i=1; i<=orderArea.children().length; i++){
+   	console.log(orderArea[0].childNodes[i].attributes.name);
+		var locInButtonBuilder = orderArea[0].childNodes[i].attributes.name.value;
+		console.log(locInButtonBuilder);
 	}
 };
-
 
 
 /*
@@ -581,6 +585,7 @@ $(document).ready(function(){
 	document.getElementById('sendOrder').onclick = function (){
 		create_orderData_json();
 		mySocket.send(JSON.stringify(ORDER_DATA));
+		/*    UN COMMENT BELOW, COMMENTED DURING TESTING ONLY  */
 		//$('#orderArea').empty();
 	};
 
@@ -593,6 +598,7 @@ $(document).ready(function(){
 			
 			if (Object.keys(JSONdata)[0] === 'buttonBuilder'){
 				console.log(JSONdata);
+				BUTTON_BUILDER = JSONdata;//set global
 				ButtonBuilder(JSONdata,'buttonBuilder');
 			}
 			if (Object.keys(JSONdata)[0] === 'confirmReceipt'){
