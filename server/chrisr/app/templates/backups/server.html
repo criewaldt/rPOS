@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Kitchen View</title>
+        <title>Server View</title>
         
 
         
@@ -21,23 +21,30 @@
                     $('#chat').val($('#chat').val() + '<' + data.msg + '>\n');
                     $('#chat').scrollTop($('#chat')[0].scrollHeight);
                 });
+				socket.on('update_rooms', function(rooms) {
+					all_rooms = [];
+					for (i = 0; i < rooms.all.length; i++) { 
+						all_rooms.push(rooms.all[i]);
+					};
+					$('#all_rooms').val(all_rooms);
+				});
                 socket.on('message', function(data) {
                     $('#chat').val($('#chat').val() + data.msg + '\n');
                     $('#chat').scrollTop($('#chat')[0].scrollHeight);
                 });
 				
 				
+				
                 $('#text').keypress(function(e) {
                     var code = e.keyCode || e.which;
                     if (code == 13) {
                         text = $('#text').val();
-						toRoom = $('#all_rooms').val();
+						toRoom = $('#room').val();
                         $('#text').val('');
                         socket.emit('text', {msg: text, room:toRoom});
                     }
                 });
             });
-			
             function leave_room() {
                 socket.emit('left', {}, function() {
                     socket.disconnect();
@@ -45,37 +52,93 @@
                     // go back to the login page
                     window.location.href = "{{ url_for('main.index') }}";
                 });
-            }
+			
+            };
+			
+			
 			
 			
         </script>
+		
+		
    
 		
 		<!-- instantiate orderData from Jinja to Javascript -->
 		<script type="text/javascript">
 			//load order data into javascript from jinja2
 			var orderData = {{ order|safe }};
+			
+			
 		</script>
 		
 		
     </head>
     <body>
 		<div class="container">
-			<h1>Kitchen View</h1>
+			<h1>Server View</h1>
             <h1 id="vp">Socket Feed</h1>
 			
+			<button onclick="add_order();">Add sample order</button>
+			
 			<textarea id="chat" cols="80" rows="20"></textarea><br><br>
-			<div class="form-group">
-				<label for="all_rooms">Select room to emit to:</label>
-					<select class="form-control" id="all_rooms">
-					  <option>kitchen</option>
-					  <option>server</option>
-					  <option>All</option>
-					</select>
-			</div>
 			<input id="text" size="80" placeholder="Enter your message here"><br><br>
 			<a href="#" onclick="leave_room();">Leave this room</a>
 			
+			<h3>Send to specific room</h3>
+			<p>All rooms: <br>{{all_rooms}}</p>
+			<input id="all_rooms" size="80" placeholder="All rooms"><br><br>
+			<div class="form-group">
+			<label for="sel1">Select list:</label>
+			<select class="form-control" id="room_list">
+				
+				
+			  
+			</select>
+		  </div>
+			
+			
+            
+            <ul id="showView" class="nav nav-tabs text-center">
+                <li id="AllView" onclick="toggleDisplay('All');"><a>All</a></li>
+                <li id="HotView" onclick="toggleDisplay('Hot');"><a>Hot</a></li>
+                <li id="ColdView" onclick="toggleDisplay('Cold');"><a>Cold</a></li>
+            </ul>
+			
+			
+			
+			
+			<div id="All">
+			<table class="table" id="orderTable" >
+				<h3>All</h3>
+				<thead>
+				<tr>
+					<th>Item Name</th>
+					<th>Time</th>
+					<th>Category</th>
+					<th>Toggle</th>
+				</tr>
+				</thead>
+				{% for item in order %}
+				<tr id="{{item.id}}">
+					<td>
+						{{item.name}}
+					</td>
+					<td>
+						<div class="countup">
+							<div id="targetdate" style="display: none">{{item.datetime}}</div>
+							<div id="timer"></div>
+						</div>
+					</td>
+					<td>
+						{{item.category}}
+					</td>
+					<td>
+						<button id="{{item}}" class="myButton">Clear Item</button>
+					</td>
+				</tr>
+				{% endfor %}
+			</table>
+			</div>
 
 
 		</div>

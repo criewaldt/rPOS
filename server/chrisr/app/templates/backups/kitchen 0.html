@@ -1,0 +1,125 @@
+<html ng-app="rPOSkitchen" ng-controller="rPOSkitchenController as rPOS">
+    <head>
+        <title>Flask-SocketIO - Pick a name and room: {{ room }}</title>
+        
+
+        
+        <!-- Bootstrap Core CSS -->
+        <link href="static/css/bootstrap.min.css" rel="stylesheet">
+		
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
+        <script src="static/js/rPOSkitchen.js"></script>
+        
+        
+        <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+        <script src="static/js/sock.js"></script>
+        
+        <script>
+                var clock = $('.your-clock').FlipClock({
+            // ... your options here
+            });
+            </script>
+        
+    </head>
+    <body>
+        <div class="col-lg-12">
+            <p>Instructions: click a view link below. Click the 'add items to order' buttont o add some test items.</p>
+            <button ng-click="rPOS.addSampleItem()">Add items to order</button>
+            <h1>rPOS Kitchen Screen: {[{rPOS.view}]}</h1>
+			
+			<input type="text" id="but1" />
+<input type="text" id="but2" />
+<input type="text" id="but3" />
+<input type="button" value="start" onclick="timer(1)" />
+<input type="button" value="start" onclick="timer(2)" />
+<input type="button" value="start" onclick="timer(3)" />
+<input type="button" value="stop" onclick="stoptimer(1)" />
+<input type="button" value="stop" onclick="stoptimer(2)" />
+<input type="button" value="stop" onclick="stoptimer(3)" />
+
+
+<script type="text/javascript">
+var counts = [];
+var xs = [];
+for (var i = 1; i < 10; i++) {
+  counts.push(i*2);
+  xs.push(0);
+};
+
+
+
+
+function timer(id)
+{
+  xs[id]=setTimeout("timer("+id+")",1000);
+  counts[id]=counts[id]-1;
+  document.getElementById("but"+id).value=counts[id];
+  if (counts[id] <1){counts[id]=5;}
+}
+
+function stoptimer(id)
+{
+  clearTimeout(xs[id]);
+}
+
+</script>
+            
+            <ul class="nav nav-tabs text-center">
+                <li><a ng-click="rPOS.currentView('all')">All</a></li>
+                <li><a ng-click="rPOS.currentView('hot')">Hot</a></li>
+                <li><a ng-click="rPOS.currentView('cold')">Cold</a></li>
+            </ul>
+            
+            <div class="your-clock"></div>
+            
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th>Item Name</th>
+                    <th>Time</th>
+                    <th>Category</th>
+                    <th>Toggle</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="item in rPOS.orderView track by $index">
+                        <td>{[{item.name}]}</td>
+                        <td>
+                            
+                            <p>Time goes here</p>
+                            
+                        </td>
+                        <td>{[{item.section}]}</td>
+                        <td><button ng-click="rPOS.deleteItem(item)" type="button" class="btn btn-success">Clear Item</button></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            
+            
+            <br>
+            <h1>- Test output -</h1>
+            <h3>rPOS.order =</h3>
+            <div ng-repeat="item in rPOS.orderList">
+                <p>{[{item}]}</p>
+            </div>
+            
+            <h3>rPOS.orderView =</h3>
+            <div ng-repeat="item in rPOS.orderView">
+                <p>{[{item}]}</p>
+            </div>
+			
+			
+			
+        
+        </div>
+        
+        <!-- jQuery Version 1.11.1 -->
+        <script src="static/js/jquery.js"></script>
+    
+        <!-- Bootstrap Core JavaScript -->
+        <script src="static/js/bootstrap.min.js"></script>
+        
+    </body>
+</html>

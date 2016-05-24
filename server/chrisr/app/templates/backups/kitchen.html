@@ -31,13 +31,11 @@
                     var code = e.keyCode || e.which;
                     if (code == 13) {
                         text = $('#text').val();
-						toRoom = $('#all_rooms').val();
                         $('#text').val('');
-                        socket.emit('text', {msg: text, room:toRoom});
+                        socket.emit('text', {msg: text});
                     }
                 });
             });
-			
             function leave_room() {
                 socket.emit('left', {}, function() {
                     socket.disconnect();
@@ -65,17 +63,53 @@
             <h1 id="vp">Socket Feed</h1>
 			
 			<textarea id="chat" cols="80" rows="20"></textarea><br><br>
-			<div class="form-group">
-				<label for="all_rooms">Select room to emit to:</label>
-					<select class="form-control" id="all_rooms">
-					  <option>kitchen</option>
-					  <option>server</option>
-					  <option>All</option>
-					</select>
-			</div>
 			<input id="text" size="80" placeholder="Enter your message here"><br><br>
 			<a href="#" onclick="leave_room();">Leave this room</a>
 			
+			
+			
+            
+            <ul id="showView" class="nav nav-tabs text-center">
+                <li id="AllView" onclick="toggleDisplay('All');"><a>All</a></li>
+                <li id="HotView" onclick="toggleDisplay('Hot');"><a>Hot</a></li>
+                <li id="ColdView" onclick="toggleDisplay('Cold');"><a>Cold</a></li>
+            </ul>
+			
+			
+			
+			
+			<div id="All">
+			<table class="table" id="orderTable" >
+				<h3>All</h3>
+				<thead>
+				<tr>
+					<th>Item Name</th>
+					<th>Time</th>
+					<th>Category</th>
+					<th>Toggle</th>
+				</tr>
+				</thead>
+				{% for item in order %}
+				<tr id="{{item.id}}">
+					<td>
+						{{item.name}}
+					</td>
+					<td>
+						<div class="countup">
+							<div id="targetdate" style="display: none">{{item.datetime}}</div>
+							<div id="timer"></div>
+						</div>
+					</td>
+					<td>
+						{{item.category}}
+					</td>
+					<td>
+						<button id="{{item}}" class="myButton">Clear Item</button>
+					</td>
+				</tr>
+				{% endfor %}
+			</table>
+			</div>
 
 
 		</div>

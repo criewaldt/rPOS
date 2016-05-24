@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>Kitchen View</title>
+        <title>Server View</title>
         
 
         
@@ -21,10 +21,12 @@
                     $('#chat').val($('#chat').val() + '<' + data.msg + '>\n');
                     $('#chat').scrollTop($('#chat')[0].scrollHeight);
                 });
+				
                 socket.on('message', function(data) {
                     $('#chat').val($('#chat').val() + data.msg + '\n');
                     $('#chat').scrollTop($('#chat')[0].scrollHeight);
                 });
+				
 				
 				
                 $('#text').keypress(function(e) {
@@ -37,7 +39,6 @@
                     }
                 });
             });
-			
             function leave_room() {
                 socket.emit('left', {}, function() {
                     socket.disconnect();
@@ -45,24 +46,32 @@
                     // go back to the login page
                     window.location.href = "{{ url_for('main.index') }}";
                 });
-            }
+			
+            };
+			
+			
 			
 			
         </script>
+		
+		
    
 		
 		<!-- instantiate orderData from Jinja to Javascript -->
 		<script type="text/javascript">
 			//load order data into javascript from jinja2
 			var orderData = {{ order|safe }};
+			
+			
 		</script>
 		
 		
     </head>
     <body>
 		<div class="container">
-			<h1>Kitchen View</h1>
+			<h1>Server View</h1>
             <h1 id="vp">Socket Feed</h1>
+			
 			
 			<textarea id="chat" cols="80" rows="20"></textarea><br><br>
 			<div class="form-group">
@@ -75,6 +84,10 @@
 			</div>
 			<input id="text" size="80" placeholder="Enter your message here"><br><br>
 			<a href="#" onclick="leave_room();">Leave this room</a>
+			
+			
+			
+			
 			
 
 
