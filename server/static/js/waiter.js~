@@ -3,10 +3,10 @@ window.mySocket;//setup global var for the websocket
 var SCREEN_WIDTH_MEDIA_QUERY;  //used to check what bootstrap col-* class is being used to switch to responsive
 var ORDER_DATA = {'ORDER_DATA' : {}};
 var ORDER_TOTAL = 0.00;      
-var ELMNT_ID_SPACE_CHAR = "-";   //space char in element name attr to denote location in buttonBuilder json
+var ELMNT_ID_SPACE_CHAR = ".";   //space char in element name attr to denote location in buttonBuilder json
 var PAGE_IS_READY = false;//used to test when all html is built
 var WAIT_FOR_USER = false;//used to prevent new input if waiting for a selection from user
-
+var BUTTON_BUILDER;// used to hold the JSON sent from server used to build .... everything
 /*-------These Function are used to build buttons on the screen--------
 ButtonBuilder():
 	IN: obj - a json
@@ -26,10 +26,14 @@ function ButtonBuilder(obj,parentKey,id) {
 	
 	var id = id || "";
 	var childKey = Object.keys(obj[parentKey]);
+	
+	//special attributes related to the HTML view and item details
+	//they need to be removed because they are not intended to be actual HTML elements
 	var CustomStyle = false;
+	var itemInfo = false;
 	for (var x =0; x<childKey.length;x++) {
-		if (childKey[x]  === 'CustomStyle'){
-		childKey.splice(x,1);//remove CustomStyle
+		if (childKey[x]  === 'CustomStyle' || childKey[x]  === 'itemInfo'){
+			childKey.splice(x,1);//remove CustomStyle
 		};
 	};
 	
@@ -44,6 +48,7 @@ function ButtonBuilder(obj,parentKey,id) {
 			CustomStyle = obj[parentKey][childKey[i]].CustomStyle;}
 			
 			var jsonID = id+ELMNT_ID_SPACE_CHAR+[childKey[i]];
+			
 			//if id has 'spacer' GLOBAL VAR as first character, skip over it so ID starts with a letter
 			if (jsonID.charAt(0)==ELMNT_ID_SPACE_CHAR) {jsonID = jsonID.substring(1);};				
 				
@@ -84,30 +89,25 @@ HTMLgenerator():
 	OUT: nothing			
 */
 function HTMLgenerator(id,parentDiv,CustomStyle) {
-
 	
 	if (parentDiv==="") {parentDiv='terminal';};//the root element of JSON is added to the terminal
-
 	
 		//isolate just the name of the item
 		var nm = id.substring(id.lastIndexOf(ELMNT_ID_SPACE_CHAR)+1);//string split ID for elements name attribute
 		
 		if (parentDiv==='terminal') {
-			var newDiv = HTMLelement("div",{ID:id,NAME:nm,CLASS:'button',innerHTML:nm,CustomStyle});
+			var newDiv = HTMLelement("div",{id:id,name:nm,class:'button',innerHTML:nm,CustomStyle});
 		}else {
-			var newDiv = HTMLelement("div",{ID:id,NAME:nm,CLASS:'subbutton',innerHTML:nm,CustomStyle});
+			var newDiv = HTMLelement("div",{id:id,name:nm,class:'subbutton',innerHTML:nm,CustomStyle});
 		}
-		
 		document.getElementById(parentDiv).appendChild(newDiv);
-		
-	
 };
 /*
 HTMLelement(a)
 	IN: a - variable argument. it is in the form
 				('elementType,{elementProperties}) where {elementProperties} is an object with variable
 				number of properties to be set for the new element.  Sometimes custom properties for style are sent.
-				for example change background color, text size or inner html. these come in as the property : stylProps.
+				for example change background color, text size or inner html. these come in as the property : CustomStyle.
 				they overwrite defaults.
 	PURPOSE: used to create HTML elements
 	FUNCTIONS USED:
@@ -121,35 +121,36 @@ function HTMLelement(a) {
 	var elementProperties = Array.prototype.splice.call(arguments,1);
 	var Element = document.createElement(a);
 	console.log(elementProperties[0]);
+	
 	//check if 'custom' style properties were sent
 	if(elementProperties[0].CustomStyle){
-		//overwrite the defaults from HTMLgenerator() and createItem() with CustomStyle
+	//if 'custom' styles, overwrite the defaults from HTMLgenerator() and createItem() with CustomStyle
 	$.extend(elementProperties[0],elementProperties[0].CustomStyle);
 	};
 		//add properties 
-		if (elementProperties[0].CLASS) {
-			Element.setAttribute('class',elementProperties[0].CLASS);
+		if (elementProperties[0].class) {
+			Element.setAttribute('class',elementProperties[0].class);
 		};
-		if (elementProperties[0].ID) {
-			Element.setAttribute('id',elementProperties[0].ID);
+		if (elementProperties[0].id) {
+			Element.setAttribute('id',elementProperties[0].id);
 		};
-		if (elementProperties[0].NAME) {
-			Element.setAttribute('name',elementProperties[0].NAME);
+		if (elementProperties[0].name) {
+			Element.setAttribute('name',elementProperties[0].name);
 		};
-		if (elementProperties[0].VALUE) {
-			Element.setAttribute('value',elementProperties[0].VALUE);
+		if (elementProperties[0].value) {
+			Element.setAttribute('value',elementProperties[0].value);
 		};
 		if (elementProperties[0].innerHTML) {
 				Element.innerHTML = elementProperties[0].innerHTML;
 		};
-		if (elementProperties[0].BACKGROUND_COLOR) {
-				Element.style.backgroundColor = elementProperties[0].BACKGROUND_COLOR;
+		if (elementProperties[0].background_color) {
+				Element.style.backgroundColor = elementProperties[0].background_color;
 		};
-		if (elementProperties[0].COLOR) {
-				Element.style.color = elementProperties[0].COLOR;
+		if (elementProperties[0].color) {
+				Element.style.color = elementProperties[0].color;
 		};
-		if (elementProperties[0].FONT_SIZE) {
-				Element.style.fontSize = elementProperties[0].FONT_SIZE;
+		if (elementProperties[0].font_size) {
+				Element.style.fontSize = elementProperties[0].font_size;
 		};
 	return Element;
 };
@@ -170,7 +171,12 @@ createItem(id,parentDiv,price):
 function createItem(id,parentDiv,CustomStyle,price){
 
 	var nm = id.substring(id.lastIndexOf(ELMNT_ID_SPACE_CHAR)+1);//create var for elements name attribute
-	var newItem = HTMLelement("p",{CLASS:'item stockYES',ID:id,VALUE:price,NAME:nm,innerHTML:nm,CustomStyle});
+	var newItem = HTMLelement("p",{class:'item stockYES',
+											id:id,
+											value:price,
+											name:nm,
+											innerHTML:nm,
+											CustomStyle});
 	document.getElementById(parentDiv).appendChild(newItem);
 };
 /*
@@ -192,7 +198,9 @@ function addItemToOrder(id,count,price,mod){
 	if (!modify) {
 	//	ORDER_TOTAL += parseFloat(price);
 		var itemName = Name+'-'+count;
-		var newItem = HTMLelement("ul",{ID:itemName,VALUE:price,NAME:id});
+		var newItem = HTMLelement("ul",{id:itemName,
+													value:price,
+													name:id});
 		document.getElementById('orderArea').appendChild(newItem);
 		$('#'+itemName).html(Name.toUpperCase() +'  $'+price);
 		updateOrderTotal();
@@ -223,7 +231,7 @@ function modifyItemInOrder(Name,count,price,id) {
 		var itemToModify = $('#orderArea').children().last();};//modify the last item that was added
 		
 	var itemName = Name+'-'+count;//creates unique
-	var newItem = HTMLelement("li",{NAME:id,ID:itemName,VALUE:price});
+	var newItem = HTMLelement("li",{name:id,id:itemName,value:price});
 
 	itemToModify.append(newItem);
 	$('#'+itemName).html(Name.toUpperCase() +'  $'+price);
@@ -251,8 +259,7 @@ function display_CategoryView(parentDiv) {
 	smallDsply=false;//hard OVERIDE
 	
 	var previousSelection = $('.ActiveCategory');
-	console.log(previousSelection);
-	console.log(parentDiv.hasClass('ActiveCategory'));
+
 	if(smallDsply && parentDiv.hasClass('ActiveCategory')){parentDiv.children().toggle();};
 	var view = $('#categoryView');
 
@@ -284,7 +291,6 @@ display_ItemView(parentDiv):
 		it and return to it's correct parent.  
 	OTHER FUNCTIONS USED:
 			none
-			
 	OUT: nothing
 */
 function display_ItemView(parentDiv) {
@@ -313,8 +319,7 @@ function display_ItemView(parentDiv) {
 
 	parentDiv.siblings().children().not('#itemView').css('display','none');
 	view.css('display','block');
-	view.children().toggle();
-	
+	view.children().toggle();	
 };
 /*
 display_ItemModifiers(mods):
@@ -373,15 +378,26 @@ $('#orderTotal').html('Total:  $'+ORDER_TOTAL.toFixed(2));//force 2 decimals
 
 /*
 create_orderData_json()
+
+*****MAKE ME
+this function needs to grab everything in orderArea and pack into a json
+this will replace the direct adding to ORDER_TOTAL in updateOrderTotal
+
+idea now is to itterate the children of orderArea, check if each element has children
+of its own (these are the modifiers) and add to the ORDER_DATA json
+//ORDER_DATA = {'ORDER_DATA' : {}};
+
 */
 function create_orderData_json(){
 	var orderArea = $('#orderArea');
-	console.log(orderArea.children().length);
-   for (var i=0; i<orderArea.children().length; i++){
-	console.log(orderArea.children().attr('name'));
+	//console.log(orderArea.children().length);
+	//console.log(orderArea[0].childNodes);
+   for (var i=1; i<=orderArea.children().length; i++){
+   	console.log(orderArea[0].childNodes[i].attributes.name);
+		var locInButtonBuilder = orderArea[0].childNodes[i].attributes.name.value;
+		console.log(locInButtonBuilder);
 	}
 };
-
 
 
 /*
@@ -569,6 +585,7 @@ $(document).ready(function(){
 	document.getElementById('sendOrder').onclick = function (){
 		create_orderData_json();
 		mySocket.send(JSON.stringify(ORDER_DATA));
+		/*    UN COMMENT BELOW, COMMENTED DURING TESTING ONLY  */
 		//$('#orderArea').empty();
 	};
 
@@ -581,6 +598,7 @@ $(document).ready(function(){
 			
 			if (Object.keys(JSONdata)[0] === 'buttonBuilder'){
 				console.log(JSONdata);
+				BUTTON_BUILDER = JSONdata;//set global
 				ButtonBuilder(JSONdata,'buttonBuilder');
 			}
 			if (Object.keys(JSONdata)[0] === 'confirmReceipt'){
